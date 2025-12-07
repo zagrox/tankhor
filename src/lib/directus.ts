@@ -63,8 +63,8 @@ export interface DirectusSchema {
   material: Material[];
   gender: Gender[];
   vendors: Vendor[];
-  
-  [key: string]: any; 
+  // FIX: Removed permissive index signature '[key: string]: any;' to allow for correct type inference by the Directus SDK.
+  // This was causing all API response types to be inferred as 'any' or '{}', leading to cascading errors.
 }
 
 const CRM_URL = 'https://crm.tankhor.com';
@@ -83,14 +83,14 @@ export const getAssetUrl = (id: string | undefined) => {
 // --- API Helpers ---
 
 // Configuration
-export const fetchAppConfiguration = async () => {
+export const fetchAppConfiguration = async (): Promise<AppConfiguration> => {
   return await directus.request(readSingleton('configuration', {
     fields: ['*', 'app_logo']
   }));
 };
 
 // Products
-export const fetchProducts = async (filter?: any) => {
+export const fetchProducts = async (filter?: any): Promise<Product[]> => {
   try {
     const result = await directus.request(readItems('products', {
       fields: ['*', 'product_store.id', 'product_store.store_name', 'product_store.store_slug', 'product_store.store_logo'],
@@ -109,7 +109,7 @@ export const fetchProducts = async (filter?: any) => {
   }
 };
 
-export const fetchProductById = async (id: string) => {
+export const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
     const result = await directus.request(readItem('products', Number(id), {
       fields: ['*', 'product_store.id', 'product_store.store_name', 'product_store.store_slug', 'product_store.store_logo']
@@ -173,7 +173,7 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
 
 // --- Filter Collections Fetchers ---
 
-export const fetchSeasons = async () => {
+export const fetchSeasons = async (): Promise<Season[]> => {
   try {
     return await directus.request(readItems('seasons'));
   } catch (error) {
@@ -182,7 +182,7 @@ export const fetchSeasons = async () => {
   }
 };
 
-export const fetchStyles = async () => {
+export const fetchStyles = async (): Promise<Style[]> => {
   try {
     return await directus.request(readItems('styles'));
   } catch (error) {
@@ -191,7 +191,7 @@ export const fetchStyles = async () => {
   }
 };
 
-export const fetchMaterials = async () => {
+export const fetchMaterials = async (): Promise<Material[]> => {
   try {
     return await directus.request(readItems('material'));
   } catch (error) {
@@ -200,7 +200,7 @@ export const fetchMaterials = async () => {
   }
 };
 
-export const fetchGenders = async () => {
+export const fetchGenders = async (): Promise<Gender[]> => {
   try {
     return await directus.request(readItems('gender'));
   } catch (error) {
@@ -209,7 +209,7 @@ export const fetchGenders = async () => {
   }
 };
 
-export const fetchVendors = async () => {
+export const fetchVendors = async (): Promise<Vendor[]> => {
   try {
     return await directus.request(readItems('vendors', { fields: ['*'] }));
   } catch (error) {
@@ -270,7 +270,8 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
     let productFilter: any;
 
     if (type === 'vendor') {
-      const storeIds = info.vendor_stores || [];
+      const vendorInfo = info as Vendor;
+      const storeIds = vendorInfo.vendor_stores || [];
       if (storeIds.length === 0) {
         return { info, products: [] };
       }
