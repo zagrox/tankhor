@@ -4,13 +4,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { fetchProductById } from '../lib/directus';
-import { Product } from '../types';
+import { Product, Color, Size } from '../types';
 import { 
   ShoppingBag, 
   Star, 
   ShieldCheck, 
   Truck, 
-  Play, 
   Heart, 
   Share2, 
   AlertCircle,
@@ -29,9 +28,8 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Selection State
-  const [activeImage, setActiveImage] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState<Color | null>(null);
+  const [selectedSize, setSelectedSize] = useState<Size | null>(null);
   const [quantity, setQuantity] = useState(1);
 
   // Fetch Data
@@ -45,10 +43,9 @@ const ProductDetail: React.FC = () => {
         
         if (data) {
           setProduct(data);
-          setActiveImage(data.image);
           // Default selections
           if (data.colors && data.colors.length > 0) {
-            setSelectedColor(data.colors[0].name);
+            setSelectedColor(data.colors[0]);
           }
           if (data.sizes && data.sizes.length > 0) {
             setSelectedSize(data.sizes[0]);
@@ -68,8 +65,6 @@ const ProductDetail: React.FC = () => {
   }, [id, setIsLoading]);
 
   if (isLoading) {
-    // The global loader is now handling the loading state.
-    // This component can return null or a minimal skeleton if desired.
     return null;
   }
 
@@ -84,12 +79,7 @@ const ProductDetail: React.FC = () => {
   }
 
   // Derived Data
-  const gallery = product.gallery && product.gallery.length > 0 ? product.gallery : [product.image];
-  
   const hasPrice = product.price > 0;
-  const discountedPrice = (hasPrice && product.discount) 
-    ? product.price * (1 - product.discount / 100) 
-    : product.price;
 
   return (
     <div className="product-detail-container">
@@ -98,43 +88,29 @@ const ProductDetail: React.FC = () => {
       <nav className="breadcrumbs">
         <Link to="/">خانه</Link> / 
         <Link to="/marketplace">فروشگاه</Link> / 
-        <span>{product.category}</span>
+        <span>{product.name}</span>
       </nav>
 
       <div className="product-layout-grid">
         
-        {/* --- RIGHT: Gallery --- */}
+        {/* --- RIGHT: Image --- */}
         <div className="product-gallery-section">
           <div className="main-image-wrapper">
             <img 
-              src={activeImage} 
+              src={product.image} 
               alt={product.name} 
               className="main-img" 
               onError={(e) => (e.target as HTMLImageElement).src = 'https://placehold.co/600x800?text=No+Image'}
             />
-            {product.discount ? (
+            {product.discountPercentage ? (
               <span className="discount-badge-lg">
-                {product.discount}٪ تخفیف
+                {product.discountPercentage}٪ تخفیف
               </span>
             ) : null}
             <button className="wishlist-btn">
               <Heart size={24} />
             </button>
           </div>
-          
-          {gallery.length > 1 && (
-            <div className="gallery-thumbs">
-              {gallery.map((img, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => setActiveImage(img)}
-                  className={`thumb-btn ${activeImage === img ? 'active' : ''}`}
-                >
-                  <img src={img} alt={`view ${idx}`} />
-                </button>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* --- LEFT: Info & Buy Box --- */}
@@ -144,12 +120,9 @@ const ProductDetail: React.FC = () => {
           <div className="product-header">
             <h1 className="product-title">{product.name}</h1>
             <div className="product-meta">
-              <span className="vendor-type">{product.vendorType || 'فروشگاه'}</span>
-              
-              {/* Only show rating if available (mock for now as backend doesn't have it yet) */}
-              <div className="rating-box">
+               <div className="rating-box">
                 <Star size={16} fill="#facc15" className="text-yellow-400" />
-                <span>۴.۸</span>
+                <span>۴.۸ (mock)</span>
               </div>
             </div>
           </div>
@@ -157,10 +130,10 @@ const ProductDetail: React.FC = () => {
           {/* Price */}
           <div className="price-box">
             {hasPrice ? (
-              product.discount ? (
+              product.discountPercentage ? (
                 <div className="discounted-pricing">
                   <span className="old-price">{product.price.toLocaleString('fa-IR')}</span>
-                  <span className="final-price">{discountedPrice.toLocaleString('fa-IR')} <span className="currency">تومان</span></span>
+                  <span className="final-price">{product.finalPrice.toLocaleString('fa-IR')} <span className="currency">تومان</span></span>
                 </div>
               ) : (
                 <span className="final-price">{product.price.toLocaleString('fa-IR')} <span className="currency">تومان</span></span>
@@ -178,17 +151,17 @@ const ProductDetail: React.FC = () => {
           {/* Variants: Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="variant-group">
-              <span className="variant-label">رنگ: <span className="selected-value">{selectedColor}</span></span>
+              <span className="variant-label">رنگ: <span className="selected-value">{selectedColor?.color_name}</span></span>
               <div className="colors-grid">
-                {product.colors.map((color, idx) => (
+                {product.colors.map((color) => (
                   <button
-                    key={idx}
-                    className={`color-swatch ${selectedColor === color.name ? 'selected' : ''}`}
-                    style={{ backgroundColor: color.hex }}
-                    onClick={() => setSelectedColor(color.name)}
-                    title={color.name}
+                    key={color.id}
+                    className={`color-swatch ${selectedColor?.id === color.id ? 'selected' : ''}`}
+                    style={{ backgroundColor: color.color_hex }}
+                    onClick={() => setSelectedColor(color)}
+                    title={color.color_name}
                   >
-                    {selectedColor === color.name && <CheckCircle2 size={16} className={color.name === 'White' || color.hex === '#ffffff' ? 'text-black' : 'text-white'} />}
+                    {selectedColor?.id === color.id && <CheckCircle2 size={16} className={color.color_name === 'White' || color.color_hex === '#ffffff' ? 'text-black' : 'text-white'} />}
                   </button>
                 ))}
               </div>
@@ -198,15 +171,15 @@ const ProductDetail: React.FC = () => {
           {/* Variants: Sizes */}
           {product.sizes && product.sizes.length > 0 && (
             <div className="variant-group">
-              <span className="variant-label">سایز: <span className="selected-value">{selectedSize}</span></span>
+              <span className="variant-label">سایز: <span className="selected-value">{selectedSize?.size_name}</span></span>
               <div className="sizes-grid">
                 {product.sizes.map(size => (
                   <button
-                    key={size}
-                    className={`size-btn ${selectedSize === size ? 'selected' : ''}`}
+                    key={size.id}
+                    className={`size-btn ${selectedSize?.id === size.id ? 'selected' : ''}`}
                     onClick={() => setSelectedSize(size)}
                   >
-                    {size}
+                    {size.size_name}
                   </button>
                 ))}
               </div>
@@ -215,30 +188,25 @@ const ProductDetail: React.FC = () => {
 
           {/* Availability & Quantity */}
           <div className="stock-control-row">
-            <div className={`availability-badge ${product.stock === 0 ? 'out' : product.stock < 5 ? 'low' : ''}`}>
-               {product.stock > 0 && <CheckCircle2 size={16} />}
-               {product.stock === 0 && <AlertCircle size={16} />}
-               <span>
-                 {product.stock > 10 ? 'موجود در انبار' : 
-                  product.stock > 0 ? `فقط ${product.stock} عدد مانده` : 
-                  'ناموجود'}
-               </span>
+            <div className={`availability-badge ${product.inStock ? '' : 'out'}`}>
+               {product.inStock ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+               <span>{product.inStock ? 'موجود در انبار' : 'ناموجود'}</span>
             </div>
 
-            {product.stock > 0 && (
+            {product.inStock && (
               <div className="quantity-stepper">
                 <button onClick={() => setQuantity(q => Math.max(1, q - 1))}><Minus size={16}/></button>
                 <span>{quantity}</span>
-                <button onClick={() => setQuantity(q => Math.min(product.stock, q + 1))}><Plus size={16}/></button>
+                <button onClick={() => setQuantity(q => q + 1)}><Plus size={16}/></button>
               </div>
             )}
           </div>
 
           {/* Actions */}
           <div className="action-buttons-row">
-            <button className="btn-add-cart" disabled={product.stock === 0}>
+            <button className="btn-add-cart" disabled={!product.inStock}>
               <ShoppingBag size={20} />
-              {product.stock === 0 ? 'ناموجود' : 'افزودن به سبد خرید'}
+              {!product.inStock ? 'ناموجود' : 'افزودن به سبد خرید'}
             </button>
             <button className="btn-share">
               <Share2 size={20} />
@@ -281,75 +249,38 @@ const ProductDetail: React.FC = () => {
         <section className="detail-section">
           <h2 className="section-heading">مشخصات و توضیحات</h2>
           <div className="specs-container">
-            <p className="description-text">{product.description || 'توضیحات محصول به زودی اضافه می‌شود.'}</p>
+            {product.description && <p className="description-text">{product.description}</p>}
             
-            {product.details && Object.keys(product.details).length > 0 && (
-              <table className="specs-table">
-                <tbody>
-                  {Object.entries(product.details).map(([key, value]) => {
-                    if (!value) return null;
-                    return (
-                      <tr key={key}>
-                        <td className="spec-key">
-                          {key === 'material' ? 'جنس' :
-                           key === 'season' ? 'مناسب فصل' :
-                           key === 'style' ? 'سبک' :
-                           key === 'texture' ? 'طرح پارچه' :
-                           key === 'origin' ? 'مبدا برند' : key}
-                        </td>
-                        <td className="spec-val">{value}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
+            <table className="specs-table">
+              <tbody>
+                {product.seasons && product.seasons.length > 0 && (
+                  <tr>
+                    <td className="spec-key">مناسب فصل</td>
+                    <td className="spec-val">{product.seasons.map(s => s.season_title).join('، ')}</td>
+                  </tr>
+                )}
+                {product.styles && product.styles.length > 0 && (
+                  <tr>
+                    <td className="spec-key">سبک</td>
+                    <td className="spec-val">{product.styles.map(s => s.style_title).join('، ')}</td>
+                  </tr>
+                )}
+                {product.materials && product.materials.length > 0 && (
+                  <tr>
+                    <td className="spec-key">جنس</td>
+                    <td className="spec-val">{product.materials.map(m => m.material_title).join('، ')}</td>
+                  </tr>
+                )}
+                {product.genders && product.genders.length > 0 && (
+                  <tr>
+                    <td className="spec-key">جنسیت</td>
+                    <td className="spec-val">{product.genders.map(g => g.gender_title).join('، ')}</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </section>
-
-        {/* Reels (Only if available) */}
-        {product.reels && product.reels.length > 0 && (
-          <section className="detail-section">
-            <h2 className="section-heading">ویدیوها و ریلز</h2>
-            <div className="reels-scroller">
-              {product.reels.map(reel => (
-                <div key={reel.id} className="reel-card">
-                  <img src={reel.thumbnail} alt="Reel thumbnail" />
-                  <div className="play-overlay">
-                    <Play size={24} fill="currentColor" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Reviews (Only if available) */}
-        {product.reviews && product.reviews.length > 0 && (
-          <section className="detail-section">
-            <h2 className="section-heading">نظرات کاربران</h2>
-            <div className="reviews-list">
-              {product.reviews.map(review => (
-                <div key={review.id} className="review-card">
-                  <div className="review-header">
-                    <img src={review.avatar} alt={review.user} className="reviewer-avatar" />
-                    <div className="reviewer-info">
-                      <span className="reviewer-name">{review.user}</span>
-                      <div className="flex text-yellow-400">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} size={12} fill={i < review.rating ? "currentColor" : "none"} className={i < review.rating ? "" : "text-gray-300"} />
-                        ))}
-                      </div>
-                    </div>
-                    <span className="review-date">{review.date}</span>
-                  </div>
-                  <p className="review-text">{review.comment}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
       </div>
     </div>
   );

@@ -1,52 +1,54 @@
 
 
+// Define a new Category interface to match the Directus collection
+export interface Category {
+  id: number;
+  category_name: string;
+  category_title: string;
+}
+
+// Add new interfaces for Colors and Sizes based on Directus collections
+export interface Color {
+  id: number;
+  color_name: string;
+  color_hex: string;
+}
+
+export interface Size {
+  id: number;
+  size_name: string;
+}
+
+// Redefined Product interface to match the new relational schema
 export interface Product {
   id: string;
   name: string;
+  description: string | null;
+  overview: string | null;
+  image: string;
+  
   price: number;
-  discount?: number; // Percentage off (e.g., 20)
-  image: string; // Directus file UUID or URL
-  gallery?: string[]; // Array of URLs
-  category: string;
+  finalPrice: number; // The actual price after discount is applied
+  discountPercentage?: number;
+  
+  inStock: boolean;
+  
+  // Relational Store Data
   storeId: string;
   storeName?: string;
   storeSlug?: string;
   storeAvatar?: string;
-  vendorType?: 'Retail' | 'Wholesale' | 'Boutique';
-  description: string;
-  stock: number;
-  availability: 'In Stock' | 'Low Stock' | 'Out of Stock';
   
-  // Variations
-  colors?: { name: string; hex: string }[];
-  sizes?: string[];
-  
-  // Specs
-  details?: {
-    material?: string;
-    texture?: string;
-    season?: string;
-    style?: string;
-    origin?: string;
-  };
-
-  // Content
-  reels?: { id: string; thumbnail: string; url: string }[];
-  
-  // Social
-  reviews?: {
-    id: string;
-    user: string;
-    avatar: string;
-    rating: number;
-    date: string;
-    comment: string;
-  }[];
-  
-  // Directus System Fields
-  date_created?: string;
-  date_updated?: string;
+  // M2M Relational Attributes
+  category?: Category; // Use the new Category interface
+  materials?: Material[];
+  colors?: Color[];
+  sizes?: Size[];
+  styles?: Style[];
+  seasons?: Season[];
+  genders?: Gender[];
 }
+
 
 export interface Store {
   id: string;
@@ -96,7 +98,7 @@ export interface BlogPost {
 }
 
 export interface AppConfiguration {
-  id: string;
+  id?: string; // FIX: Make id optional as singletons don't have it
   app_logo?: string; // Added field for the global loader logo
   [key: string]: any;
 }

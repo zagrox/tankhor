@@ -45,115 +45,103 @@ export const MOCK_STORES: Store[] = [
   },
 ];
 
+// FIX: Updated the MOCK_PRODUCTS array to conform to the `Product` type definition.
+// This includes changing `stock` to `inStock`, adding `finalPrice`, and ensuring `colors`,
+// `sizes`, and now `category` match their respective interfaces.
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: 'p1',
     name: 'کت چرم کلاسیک مردانه',
     price: 4500000,
-    discount: 10,
+    finalPrice: 4050000,
+    discountPercentage: 10,
     image: 'https://picsum.photos/400/500?random=10',
-    gallery: [
-      'https://picsum.photos/400/500?random=10',
-      'https://picsum.photos/400/500?random=101',
-      'https://picsum.photos/400/500?random=102',
-      'https://picsum.photos/400/500?random=103',
-    ],
-    category: 'کت و کاپشن',
-    storeId: 's2',
-    vendorType: 'Retail',
     description: 'کت چرم طبیعی گاوی با آستر ابریشم. مناسب برای فصول سرد سال. این محصول با استفاده از چرم‌های صادراتی درجه یک تولید شده و دارای گارانتی ۲ ساله چرم مشهد می‌باشد.',
-    stock: 5,
-    availability: 'Low Stock',
+    overview: null,
+    inStock: true,
+    storeId: 's2',
+    category: { id: 1, category_name: 'Jackets', category_title: 'کت و کاپشن' },
     colors: [
-      { name: 'مشکی', hex: '#000000' },
-      { name: 'قهوه‌ای', hex: '#5D4037' },
-      { name: 'عسلی', hex: '#D2691E' }
+      { id: 1, color_name: 'مشکی', color_hex: '#000000' },
+      { id: 2, color_name: 'قهوه‌ای', color_hex: '#5D4037' },
+      { id: 3, color_name: 'عسلی', color_hex: '#D2691E' }
     ],
-    sizes: ['M', 'L', 'XL', 'XXL'],
-    details: {
-      material: 'چرم طبیعی گاوی',
-      texture: 'دانه دار',
-      season: 'پاییز و زمستان',
-      style: 'کلاسیک / رسمی',
-      origin: 'ایران'
-    },
-    reels: [
-      { id: 'r1', thumbnail: 'https://picsum.photos/200/300?random=200', url: '#' },
-      { id: 'r2', thumbnail: 'https://picsum.photos/200/300?random=201', url: '#' },
+    sizes: [
+        { id: 1, size_name: 'M' },
+        { id: 2, size_name: 'L' },
+        { id: 3, size_name: 'XL' },
+        { id: 4, size_name: 'XXL' },
     ],
-    reviews: [
-      { id: 'rv1', user: 'علی محمدی', avatar: 'https://picsum.photos/50/50?random=300', rating: 5, date: '۱۴۰۳/۰۲/۱۰', comment: 'بسیار با کیفیت و خوش دوخت. سایزش هم دقیق بود.' },
-      { id: 'rv2', user: 'سارا جلالی', avatar: 'https://picsum.photos/50/50?random=301', rating: 4, date: '۱۴۰۳/۰۱/۲۵', comment: 'جنس چرم عالیه ولی کمی سنگینه.' }
-    ]
   },
   {
     id: 'p2',
     name: 'پیراهن مجلسی شب',
     price: 2800000,
+    finalPrice: 2800000,
     image: 'https://picsum.photos/400/500?random=11',
-    gallery: ['https://picsum.photos/400/500?random=11', 'https://picsum.photos/400/500?random=111'],
-    category: 'لباس زنانه',
+    category: { id: 2, category_name: 'Womenswear', category_title: 'لباس زنانه' },
     storeId: 's1',
-    vendorType: 'Boutique',
     description: 'پیراهن بلند مشکی با سنگ دوزی دستی. طراحی سال ۲۰۲۴. مناسب برای مجالس رسمی.',
-    stock: 12,
-    availability: 'In Stock',
+    inStock: true,
+    overview: null,
     colors: [
-      { name: 'مشکی', hex: '#000000' },
-      { name: 'زرشکی', hex: '#800020' }
+      { id: 5, color_name: 'مشکی', color_hex: '#000000' },
+      { id: 6, color_name: 'زرشکی', color_hex: '#800020' }
     ],
-    sizes: ['36', '38', '40', '42'],
-    details: {
-      material: 'کرپ مازراتی',
-      texture: 'صاف و لخت',
-      season: 'چهار فصل',
-      style: 'مجلسی'
-    },
-    reviews: []
+    sizes: [
+        { id: 7, size_name: '36' },
+        { id: 8, size_name: '38' },
+        { id: 9, size_name: '40' },
+        { id: 10, size_name: '42' },
+    ],
   },
   {
     id: 'p3',
     name: 'شلوار جین راسته',
     price: 980000,
+    finalPrice: 980000,
     image: 'https://picsum.photos/400/500?random=12',
-    category: 'شلوار',
+    category: { id: 3, category_name: 'Trousers', category_title: 'شلوار' },
     storeId: 's3',
-    stock: 20,
-    availability: 'In Stock',
+    inStock: true,
     description: 'شلوار جین با کیفیت بالا و دوخت صنعتی. رنگ ثابت.',
+    overview: null,
   },
   {
     id: 'p4',
     name: 'کیف دستی چرم',
     price: 1500000,
+    finalPrice: 1500000,
     image: 'https://picsum.photos/400/500?random=13',
-    category: 'اکسسوری',
+    category: { id: 4, category_name: 'Accessories', category_title: 'اکسسوری' },
     storeId: 's2',
-    stock: 3,
-    availability: 'Low Stock',
+    inStock: true,
     description: 'کیف دستی زنانه مناسب برای استفاده روزمره و اداری.',
+    overview: null,
   },
   {
     id: 'p5',
     name: 'مانتو تابستانه لینن',
     price: 1200000,
+    finalPrice: 1200000,
     image: 'https://picsum.photos/400/500?random=14',
-    category: 'لباس زنانه',
+    category: { id: 2, category_name: 'Womenswear', category_title: 'لباس زنانه' },
     storeId: 's1',
-    stock: 0,
-    availability: 'Out of Stock',
+    inStock: false,
     description: 'مانتو بسیار خنک و سبک از جنس الیاف طبیعی.',
+    overview: null,
   },
     {
     id: 'p6',
     name: 'کفش کتانی سفید',
     price: 2100000,
+    finalPrice: 2100000,
     image: 'https://picsum.photos/400/500?random=15',
-    category: 'کفش',
+    category: { id: 5, category_name: 'Shoes', category_title: 'کفش' },
     storeId: 's3',
-    stock: 8,
-    availability: 'In Stock',
+    inStock: true,
     description: 'راحت و طبی، مناسب پیاده‌روی طولانی.',
+    overview: null,
   },
 ];
 

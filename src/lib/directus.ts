@@ -1,7 +1,19 @@
-
-
 import { createDirectus, rest, readItems, readSingleton, readItem } from '@directus/sdk';
-import { AppConfiguration, Product, Post, Store, BlogPost, Season, Style, Material, Gender, Vendor } from '../types';
+import { 
+  AppConfiguration, 
+  Product, 
+  Post, 
+  Store, 
+  BlogPost, 
+  Season, 
+  Style, 
+  Material, 
+  Gender, 
+  Vendor, 
+  Color, 
+  Size,
+  Category
+} from '../types';
 
 // 1. Define the Backend Database Schema
 // This matches the RAW JSON response from your Directus API
@@ -10,28 +22,28 @@ interface DirectusProduct {
   status: string;
   product_name: string;
   product__description: string | null;
-  product_image: string; // UUID
-  product_price: string | null;
+  product_overview: string | null;
+  product_image: string;
+  product_price: string;
   product_discount: string | null;
-  category: string[]; // ["hoodies"]
-  product_store?: any; 
+  product_instock: boolean;
   
-  // Specific color structure from backend
-  color?: { avaible_colors: string }[]; 
-  size?: string[];
+  product_store: any; // Can be ID or Store object
   
-  // Relations/Other
-  variants?: number[];
-  
-  // M2M fields from JSON response
-  product_seasons?: number[];
-  product_styles?: number[];
-  product_materials?: number[];
-  product_genders?: number[];
+  // M2M junction fields (will contain relational objects after deep fetch)
+  product_category: { category_id: Category }[];
+  product_materials: { material_id: Material }[];
+  product_colors: { colors_id: Color }[];
+  product_sizes: { sizes_id: Size }[];
+  product_styles: { styles_id: Style }[];
+  product_seasons: { seasons_id: Season }[];
+  product_genders: { gender_id: Gender }[];
 }
 
 interface DirectusStore {
   id: number;
+  // FIX: Added `status` field to align with API filters.
+  status: string;
   store_name: string;
   store_title?: string | null;
   store_description: string | null;
@@ -58,13 +70,14 @@ export interface DirectusSchema {
   blog_posts: BlogPost[];
   
   // Filter Collections
+  category: Category[];
   seasons: Season[];
   styles: Style[];
   material: Material[];
   gender: Gender[];
   vendors: Vendor[];
-  // FIX: Removed permissive index signature '[key: string]: any;' to allow for correct type inference by the Directus SDK.
-  // This was causing all API response types to be inferred as 'any' or '{}', leading to cascading errors.
+  colors: Color[];
+  sizes: Size[];
 }
 
 const CRM_URL = 'https://crm.tankhor.com';
@@ -84,16 +97,30 @@ export const getAssetUrl = (id: string | undefined) => {
 
 // Configuration
 export const fetchAppConfiguration = async (): Promise<AppConfiguration> => {
-  return await directus.request(readSingleton('configuration', {
+  // FIX: Cast the result from readSingleton to the expected AppConfiguration type
+  // because the SDK returns a generic object without an 'id' property for singletons.
+  const config = await directus.request(readSingleton('configuration', {
     fields: ['*', 'app_logo']
   }));
+  return config as AppConfiguration;
 };
 
 // Products
 export const fetchProducts = async (filter?: any): Promise<Product[]> => {
   try {
     const result = await directus.request(readItems('products', {
-      fields: ['*', 'product_store.id', 'product_store.store_name', 'product_store.store_slug', 'product_store.store_logo'],
+      // FIX: Updated `fields` to use the new object syntax for relational data
+      // and added product_category to fix marketplace filtering.
+      fields: [
+        'id',
+        'product_name',
+        'product_price',
+        'product_discount',
+        'product_image',
+        'product_instock',
+        { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
+        { product_category: [{ category_id: ['*'] }] },
+      ],
       filter: {
         status: { _eq: 'published' }, // Only show published items
         ...filter
@@ -112,11 +139,22 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
 export const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
     const result = await directus.request(readItem('products', Number(id), {
-      fields: ['*', 'product_store.id', 'product_store.store_name', 'product_store.store_slug', 'product_store.store_logo']
+      // FIX: Updated `fields` to use the object syntax for deep-fetching relational data,
+      // which is the correct format for the Directus SDK.
+      fields: [
+        '*', 
+        { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
+        { product_category: [{ category_id: ['*'] }] },
+        { product_materials: [{ material_id: ['*'] }] },
+        { product_colors: [{ colors_id: ['*'] }] },
+        { product_sizes: [{ sizes_id: ['*'] }] },
+        { product_styles: [{ styles_id: ['*'] }] },
+        { product_seasons: [{ seasons_id: ['*'] }] },
+        { product_genders: [{ gender_id: ['*'] }] },
+      ]
     }));
-    return mapProductData(result);
-  } catch (error)
- {
+    return mapProductData(result as DirectusProduct);
+  } catch (error) {
     console.error(`Error fetching product ${id}:`, error);
     return null;
   }
@@ -127,7 +165,7 @@ export const fetchStores = async (): Promise<Store[]> => {
   try {
     const result = await directus.request(readItems('stores', {
       fields: ['id', 'store_name', 'store_slug', 'store_logo'],
-      filter: { status: { _eq: 'published' } },
+      filter: { status: { _eq: 'published' } as any }, // Cast to bypass strict type
       limit: 10 // Limit for stories bar
     }));
     return result.map(mapStoreData);
@@ -143,7 +181,7 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
        fields: ['*'],
        filter: { 
          store_slug: { _eq: slug },
-         status: { _eq: 'published' }
+         status: { _eq: 'published' } as any // Cast to bypass strict type
        },
        limit: 1,
     }));
@@ -226,8 +264,9 @@ export type CategoryType = 'season' | 'style' | 'material' | 'gender' | 'vendor'
 const fromSlug = (slug: string) => slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
 // This metadata drives the filtering logic.
+type CollectionName = 'seasons' | 'styles' | 'material' | 'gender' | 'vendors';
 const categoryMeta: Record<CategoryType, { 
-  collection: keyof DirectusSchema; 
+  collection: CollectionName; 
   slugField: string;                 
   // M2M fields, not applicable to vendor
   productField?: string;
@@ -255,8 +294,8 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
 
     // 1. Fetch category/vendor info to get its ID and related IDs
     const infoResult = await directus.request(readItems(meta.collection, {
-      fields: fieldsToFetch,
-      filter: { [meta.slugField]: { _eq: filterValue } },
+      fields: fieldsToFetch as any,
+      filter: { [meta.slugField]: { _eq: filterValue } } as any,
       limit: 1,
     }));
     const info = infoResult[0] || null;
@@ -270,7 +309,8 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
     let productFilter: any;
 
     if (type === 'vendor') {
-      const vendorInfo = info as Vendor;
+      // FIX: Cast to `unknown` first to satisfy strict type checking, as `info`'s type is not inferred correctly by the SDK with a dynamic collection.
+      const vendorInfo = info as unknown as Vendor;
       const storeIds = vendorInfo.vendor_stores || [];
       if (storeIds.length === 0) {
         return { info, products: [] };
@@ -300,16 +340,9 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
     }
 
     // 3. Fetch products using the correct filter
-    const productsResult = await directus.request(readItems('products', {
-      fields: ['*', 'product_store.id', 'product_store.store_name', 'product_store.store_slug', 'product_store.store_logo'],
-      filter: {
-        status: { _eq: 'published' },
-        ...productFilter
-      },
-      sort: ['-date_created'] as any
-    }));
+    const productsResult = await fetchProducts(productFilter);
 
-    return { info, products: productsResult.map(mapProductData) };
+    return { info, products: productsResult };
   } catch (error) {
     console.error(`Error fetching data for category ${type} with slug ${slug}:`, error);
     throw error;
@@ -347,18 +380,13 @@ const mapStoreData = (item: DirectusStore): Store => {
 
 // Transforms Backend Schema (DirectusProduct) -> Frontend Schema (Product)
 const mapProductData = (item: DirectusProduct): Product => {
-  let discountPercentage = 0;
   const price = Number(item.product_price || 0);
-  const discountPrice = Number(item.product_discount || 0);
-
-  if (price > 0 && discountPrice > 0 && discountPrice < price) {
-    discountPercentage = Math.round(((price - discountPrice) / price) * 100);
+  const finalPrice = Number(item.product_discount || price);
+  
+  let discountPercentage: number | undefined = undefined;
+  if (price > 0 && finalPrice < price) {
+    discountPercentage = Math.round(((price - finalPrice) / price) * 100);
   }
-
-  const mappedColors = item.color?.map((c, index) => ({
-    name: `Color ${index + 1}`,
-    hex: c.avaible_colors
-  })) || [];
 
   const storeData = item.product_store;
   const storeId = typeof storeData === 'object' && storeData !== null ? String(storeData.id) : String(storeData);
@@ -366,23 +394,37 @@ const mapProductData = (item: DirectusProduct): Product => {
   const storeSlug = typeof storeData === 'object' && storeData !== null ? storeData.store_slug : undefined;
   const storeAvatar = typeof storeData === 'object' && storeData !== null ? getAssetUrl(storeData.store_logo) : 'https://placehold.co/100?text=Store';
 
+  // Helper to extract nested M2M data from junction tables
+  const extractM2M = (junctions: any[], key: string): any[] => {
+    if (!Array.isArray(junctions)) return [];
+    return junctions.map(j => j[key]).filter(Boolean);
+  };
+
   return {
     id: String(item.id),
     name: item.product_name,
-    price: price,
-    discount: discountPercentage,
+    description: item.product__description,
+    overview: item.product_overview,
     image: getAssetUrl(item.product_image),
-    gallery: [getAssetUrl(item.product_image)], 
-    category: item.category?.[0] || 'Uncategorized',
+    
+    price: price,
+    finalPrice: finalPrice,
+    discountPercentage: discountPercentage,
+    
+    inStock: item.product_instock,
+    
     storeId: storeId,
     storeName: storeName,
     storeSlug: storeSlug,
     storeAvatar: storeAvatar,
-    description: item.product__description || '',
-    stock: 10,
-    availability: 'In Stock',
-    colors: mappedColors,
-    sizes: item.size || [],
-    details: {}
+    
+    // Map the deep-fetched relational data
+    category: extractM2M(item.product_category, 'category_id')[0],
+    materials: extractM2M(item.product_materials, 'material_id'),
+    colors: extractM2M(item.product_colors, 'colors_id'),
+    sizes: extractM2M(item.product_sizes, 'sizes_id'),
+    styles: extractM2M(item.product_styles, 'styles_id'),
+    seasons: extractM2M(item.product_seasons, 'seasons_id'),
+    genders: extractM2M(item.product_genders, 'gender_id'),
   };
 };

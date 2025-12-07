@@ -1,9 +1,10 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fetchProducts } from '../lib/directus'; 
 import { Product } from '../types';
-import { MOCK_PRODUCTS, MOCK_STORES } from '../constants';
+import { MOCK_PRODUCTS } from '../constants'; // Keep mock products as a fallback
 import { Link } from 'react-router-dom';
 import { Filter, ShoppingBag, ArrowUpDown } from 'lucide-react';
 
@@ -12,7 +13,7 @@ const Marketplace: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>('همه');
   const [priceSort, setPriceSort] = useState<'asc' | 'desc' | 'default'>('default');
 
   // Fetch Data on Mount
@@ -40,17 +41,18 @@ const Marketplace: React.FC = () => {
     loadData();
   }, [setIsLoading]);
 
-  // Filter Logic (Client Side for now)
-  const categories = ['همه', ...Array.from(new Set(products.map(p => p.category)))];
+  // Generate categories from fetched products
+  const categories = ['همه', ...Array.from(new Set(products.map(p => p.category?.category_title).filter(Boolean) as string[]))];
 
+  // Filter Logic (Client Side)
   const filteredProducts = products.filter(p => {
-    if (selectedCategory !== 'all' && selectedCategory !== 'همه') {
-      return p.category === selectedCategory;
+    if (selectedCategory !== 'همه') {
+      return p.category?.category_title === selectedCategory;
     }
     return true;
   }).sort((a, b) => {
-    if (priceSort === 'asc') return a.price - b.price;
-    if (priceSort === 'desc') return b.price - a.price;
+    if (priceSort === 'asc') return a.finalPrice - b.finalPrice;
+    if (priceSort === 'desc') return b.finalPrice - a.finalPrice;
     return 0;
   });
 
@@ -113,12 +115,8 @@ const Marketplace: React.FC = () => {
 
           {!isLoading && (
             <div className="products-grid">
-              {filteredProducts.map(product => {
-                // Temporary: Still matching mock stores until stores are integrated
-                const store = MOCK_STORES.find(s => s.id === product.storeId);
-                
-                return (
-                  <Link to={`/product/${product.id}`} key={product.id} className="store-product-card">
+              {filteredProducts.map(product => (
+                <Link to={`/product/${product.id}`} key={product.id} className="store-product-card">
                     <div className="card-img-wrapper">
                       <img 
                         src={product.image} 
@@ -129,17 +127,20 @@ const Marketplace: React.FC = () => {
                           (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=No+Image';
                         }}
                       />
-                      <div className="category-badge">
-                        {product.category}
-                      </div>
+                      {product.category && (
+                        <div className="category-badge">
+                          {product.category.category_title}
+                        </div>
+                      )}
                     </div>
                     <div className="card-body">
                       <h3 className="card-title">{product.name}</h3>
-                      <span className="card-store">{store?.name || 'فروشگاه'}</span>
+                      {/* Use live store name from fetched product */}
+                      <span className="card-store">{product.storeName || 'فروشگاه'}</span>
                       
                       <div className="card-footer">
                         <div className="card-price">
-                          {product.price.toLocaleString('fa-IR')} 
+                          {product.finalPrice.toLocaleString('fa-IR')} 
                           <span>تومان</span>
                         </div>
                         <button className="btn-add-mini">
@@ -148,8 +149,7 @@ const Marketplace: React.FC = () => {
                       </div>
                     </div>
                   </Link>
-                );
-              })}
+              ))}
             </div>
           )}
         </main>

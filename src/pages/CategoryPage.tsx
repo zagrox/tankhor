@@ -98,7 +98,8 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=No+Image';
                   }}
                 />
-                <div className="category-badge">{product.category}</div>
+                {/* FIX: Render the `category_title` property of the `product.category` object, not the object itself. */}
+                <div className="category-badge">{product.category?.category_title}</div>
               </div>
               <div className="card-body">
                 <h3 className="card-title">{product.name}</h3>
