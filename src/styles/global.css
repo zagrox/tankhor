@@ -1,0 +1,32 @@
+
+/* 1. Reset (Ensures consistent cross-browser behavior) */
+@import "./reset.css";
+
+/* 2. Variables (Design Tokens) */
+@import "./variables.css";
+
+/* 3. Layout Structure */
+@import "./components/Layout.css";
+@import "./components/Sidebar.css";
+
+/* 4. Pages */
+@import "./pages/SocialFeed.css";
+@import "./pages/Marketplace.css";
+@import "./pages/ProductDetail.css";
+@import "./pages/StoreProfile.css";
+@import "./pages/Blog.css";
+@import "./pages/FiltersPage.css";
+
+/* 5. Utility Classes (Helpers) */
+.text-center { text-align: center; }
+.text-secondary { color: var(--color-secondary); }
+.font-bold { font-weight: 700; }
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.object-cover { object-fit: cover; }
+.flex { display: flex; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-2 { gap: 0.5rem; }
+.cursor-pointer { cursor: pointer; }
+.hidden { display: none; }

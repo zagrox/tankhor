@@ -1,0 +1,61 @@
+:root {
+  /* --- Layout Dimensions --- */
+  --sidebar-width: 17.5rem; /* 280px */
+  --sidebar-width-collapsed: 5rem; /* 80px */
+  --header-height-mobile: 4rem;
+  
+  /* --- Colors: Light Mode --- */
+  --color-primary: #18181b; /* Zinc 900 */
+  --color-secondary: #ca8a04; /* Yellow 600 */
+  
+  --bg-body: #f8fafc; /* Slate 50 */
+  --bg-card: #ffffff;
+  --bg-surface: #f1f5f9; /* Slate 100 */
+  
+  --text-main: #0f172a; /* Slate 900 */
+  --text-muted: #64748b; /* Slate 500 */
+  
+  --border-light: #e2e8f0; /* Slate 200 */
+  
+  /* --- Shadows --- */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  
+  /* --- Radius --- */
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 9999px;
+
+  /* --- Z-Index Layers --- */
+  --z-negative: -1;
+  --z-normal: 1;
+  --z-sticky: 100;
+  --z-modal: 1000;
+  --z-tooltip: 2000;
+}
+
+/* --- Dark Mode --- */
+.dark {
+  --color-primary: #ffffff;
+  --color-secondary: #facc15; /* Yellow 400 */
+  
+  --bg-body: #09090b; /* Zinc 950 */
+  --bg-card: #18181b; /* Zinc 900 */
+  --bg-surface: #27272a; /* Zinc 800 */
+  
+  --text-main: #f4f4f5; /* Zinc 100 */
+  --text-muted: #a1a1aa; /* Zinc 400 */
+  
+  --border-light: #27272a; /* Zinc 800 */
+}
+
+/* --- Global Transitions --- */
+body {
+  background-color: var(--bg-body);
+  color: var(--text-main);
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+}

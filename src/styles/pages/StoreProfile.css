@@ -1,0 +1,406 @@
+.store-page {
+  padding-bottom: 5rem;
+}
+
+/* Header & Cover */
+.store-header {
+  position: relative;
+}
+
+.cover-container {
+  height: 16rem;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--bg-surface);
+}
+
+@media (min-width: 768px) {
+  .cover-container {
+    height: 20rem;
+  }
+}
+
+.cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+}
+
+.profile-bar-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.profile-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -4rem;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .profile-bar {
+    flex-direction: row;
+    align-items: flex-end;
+    margin-top: -5rem;
+  }
+}
+
+.avatar-container {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-img {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  border: 4px solid var(--bg-card);
+  object-fit: cover;
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-xl);
+}
+
+@media (min-width: 768px) {
+  .avatar-img {
+    width: 10rem;
+    height: 10rem;
+  }
+}
+
+.verified-badge {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.25rem;
+  border-radius: 50%;
+  border: 2px solid var(--bg-card);
+  display: flex;
+}
+
+.profile-details {
+  flex-grow: 1;
+  text-align: center;
+  padding-bottom: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .profile-details {
+    text-align: right;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.profile-name {
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+}
+
+/* 
+  FIX: The desktop-specific styles that forced the text to white have been removed.
+  The text now correctly inherits its color from the theme variables (--text-main and --text-muted),
+  ensuring it's readable in both light and dark modes, as the layout no longer places
+  this text over the cover image.
+*/
+
+.profile-handle {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.action-buttons {
+  margin-bottom: 1.5rem;
+}
+
+.btn-follow-lg {
+  background-color: var(--color-secondary);
+  color: white;
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: background-color 0.2s;
+}
+
+.btn-follow-lg:hover {
+  background-color: #a16207; /* Darker Gold */
+}
+
+/* Content */
+.content-grid {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .content-grid {
+    grid-template-columns: repeat(12, 1fr);
+  }
+}
+
+.info-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .info-sidebar {
+    grid-column: span 4;
+  }
+}
+
+.info-card {
+  background-color: var(--bg-card);
+  padding: 1.5rem;
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border-light);
+}
+
+.info-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.info-text {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.stat-item {
+  flex: 1;
+  text-align: center;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.stat-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+@media (min-width: 1024px) {
+  .main-content {
+    grid-column: span 8;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Mini Products Grid */
+.store-products-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .store-products-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.mini-product {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  text-decoration: none;
+  transition: box-shadow 0.2s;
+}
+
+.mini-product:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.mini-product img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  background-color: var(--bg-surface);
+}
+
+.mini-product-info {
+  padding: 0.75rem;
+}
+
+.mini-product-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mini-product-price {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-secondary);
+  margin-top: 0.25rem;
+}
+
+/* Mini Posts Grid */
+.store-posts-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.25rem;
+}
+
+@media (min-width: 768px) {
+  .store-posts-grid {
+    gap: 1rem;
+  }
+}
+
+.mini-post {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.mini-post img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mini-post-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mini-post:hover .mini-post-overlay {
+  opacity: 1;
+}
+
+/* Contact List */
+.contact-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-light);
+}
+
+.contact-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.contact-icon {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+.contact-details {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap; /* Allow wrapping if needed */
+  text-align: right;
+  flex-grow: 1;
+}
+
+.contact-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.contact-label::after {
+  content: ':';
+}
+
+.contact-value {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+.contact-value.link {
+  color: var(--color-secondary);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.contact-value.link:hover {
+  text-decoration: underline;
+}

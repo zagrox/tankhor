@@ -1,0 +1,48 @@
+
+/* 
+   ROBUST GRID SYSTEM 
+   Mobile: 1 Column
+   Desktop/Tablet: 2 Columns (Sidebar | Content)
+*/
+
+.layout-container {
+  display: grid;
+  min-height: 100vh;
+  /* Default: Mobile View */
+  grid-template-columns: 100%;
+  grid-template-rows: 1fr; /* Content only */
+}
+
+/* Desktop & Tablet View (Sidebar on Right because RTL) */
+@media (min-width: 768px) {
+  .layout-container {
+    /* 
+       RTL Grid: Column 1 is Right, Column 2 is Left
+       Sidebar (Auto width) | Content Flexible 
+       Using 'auto' allows the sidebar CSS to control the width (expanded vs collapsed)
+    */
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 1fr;
+  }
+}
+
+/* Main Content Area */
+.layout-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents grid blowout */
+  position: relative;
+}
+
+.main-content-area {
+  flex: 1;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ensure mobile nav doesn't overlap content at very bottom */
+@media (max-width: 767px) {
+  .main-content-area {
+    padding-bottom: 6rem; /* Space for bottom nav */
+  }
+}

@@ -1,0 +1,333 @@
+.cart-page {
+  max-width: 80rem; /* 1280px */
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.cart-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.cart-count {
+  background-color: var(--bg-surface);
+  color: var(--text-muted);
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Layout */
+.cart-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .cart-layout {
+    grid-template-columns: 1fr 24rem; /* Content | Summary */
+    align-items: start;
+  }
+}
+
+/* Empty State */
+.cart-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+.empty-icon-box {
+  width: 6rem;
+  height: 6rem;
+  background-color: var(--bg-surface);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.cart-empty-state h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.cart-empty-state p {
+  color: var(--text-muted);
+  max-width: 20rem;
+}
+
+.btn-start-shopping {
+  background-color: var(--color-primary);
+  color: white;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  margin-top: 1rem;
+  transition: opacity 0.2s;
+}
+
+.btn-start-shopping:hover {
+  opacity: 0.9;
+}
+
+/* Items List */
+.cart-items-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.cart-item-card {
+  display: flex;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-2xl);
+  padding: 1rem;
+  gap: 1rem;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+
+.cart-item-card:hover {
+  box-shadow: var(--shadow-sm);
+}
+
+.cart-item-image {
+  width: 6rem;
+  height: 6rem;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background-color: var(--bg-surface);
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .cart-item-image {
+    width: 8rem;
+    height: 8rem;
+  }
+}
+
+.cart-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item-details {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.cart-item-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 0.25rem 0;
+}
+
+.cart-item-info a:hover h3 {
+  color: var(--color-secondary);
+}
+
+.trust-badge-mini {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+.cart-item-actions {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-surface);
+  border-radius: var(--radius-lg);
+  padding: 0.25rem;
+}
+
+.qty-btn {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background-color: var(--bg-card);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: var(--shadow-sm);
+}
+
+.qty-btn:hover:not(:disabled) {
+  color: var(--color-secondary);
+}
+
+.qty-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.qty-value {
+  width: 2rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.item-total-price {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.item-total-price .currency {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.remove-btn {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  transition: color 0.2s;
+}
+
+.remove-btn:hover {
+  color: #ef4444; /* Red 500 */
+}
+
+/* Summary Box */
+.cart-summary-column {
+  position: relative;
+}
+
+.summary-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-2xl);
+  padding: 1.5rem;
+  position: sticky;
+  top: 2rem; /* Stick to top when scrolling */
+}
+
+.summary-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.summary-row span:last-child {
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.divider {
+  height: 1px;
+  background-color: var(--border-light);
+  margin: 1.5rem 0;
+  border: none;
+}
+
+.summary-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+  font-size: 1.125rem;
+  color: var(--text-main);
+}
+
+.total-amount {
+  font-size: 1.5rem;
+  color: var(--color-secondary);
+}
+
+.summary-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  background-color: var(--bg-surface);
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.checkout-btn {
+  width: 100%;
+  background-color: var(--color-primary);
+  color: white; /* In dark mode this might need adjustment if primary is white */
+  padding: 1rem;
+  border-radius: var(--radius-xl);
+  font-weight: 700;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  transition: opacity 0.2s;
+}
+
+.dark .checkout-btn {
+  background-color: var(--color-secondary); /* Use Gold in dark mode for contrast against dark bg */
+  color: black;
+}
+
+.checkout-btn:hover {
+  opacity: 0.9;
+}
+
+.rtl-flip {
+  transform: scaleX(-1); /* Flip arrow for RTL */
+}
