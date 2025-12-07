@@ -1,10 +1,10 @@
 
 
-// Define a new Category interface to match the Directus collection
+// Update the Category interface to match the Directus collection schema
 export interface Category {
   id: number;
   category_name: string;
-  category_title: string;
+  category_parent: string;
 }
 
 // Add new interfaces for Colors and Sizes based on Directus collections

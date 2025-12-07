@@ -1,28 +1,33 @@
-
 /* 
    ROBUST GRID SYSTEM 
    Mobile: 1 Column
-   Desktop/Tablet: 2 Columns (Sidebar | Content)
+   Desktop/Tablet: 2 or 3 Columns
 */
 
 .layout-container {
   display: grid;
   min-height: 100vh;
   /* Default: Mobile View */
-  grid-template-columns: 100%;
-  grid-template-rows: 1fr; /* Content only */
+  grid-template-columns: 1fr; /* Content fills width */
+  grid-template-rows: 1fr; 
 }
 
-/* Desktop & Tablet View (Sidebar on Right because RTL) */
+/* Tablet & Smaller Desktop View (Sidebar on Right because RTL) */
 @media (min-width: 768px) {
   .layout-container {
-    /* 
-       RTL Grid: Column 1 is Right, Column 2 is Left
-       Sidebar (Auto width) | Content Flexible 
-       Using 'auto' allows the sidebar CSS to control the width (expanded vs collapsed)
-    */
-    grid-template-columns: auto 1fr;
-    grid-template-rows: 1fr;
+    /* Using 'auto' allows the sidebar CSS to control its width */
+    grid-template-columns: auto 1fr; /* Sidebar | Content */
+  }
+}
+
+/* 
+  Large Desktop View with Secondary Sidebar active
+  (3-column layout)
+*/
+@media (min-width: 1024px) {
+  .layout-container.with-secondary-sidebar {
+    /* Sidebar | Secondary Sidebar | Content */
+    grid-template-columns: auto var(--secondary-sidebar-width) 1fr;
   }
 }
 
@@ -32,6 +37,7 @@
   flex-direction: column;
   min-width: 0; /* Prevents grid blowout */
   position: relative;
+  overflow-x: hidden; /* Hide horizontal overflow */
 }
 
 .main-content-area {

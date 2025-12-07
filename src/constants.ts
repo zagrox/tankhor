@@ -45,9 +45,7 @@ export const MOCK_STORES: Store[] = [
   },
 ];
 
-// FIX: Updated the MOCK_PRODUCTS array to conform to the `Product` type definition.
-// This includes changing `stock` to `inStock`, adding `finalPrice`, and ensuring `colors`,
-// `sizes`, and now `category` match their respective interfaces.
+// FIX: Updated the MOCK_PRODUCTS array to conform to the new `Category` type.
 export const MOCK_PRODUCTS: Product[] = [
   {
     id: 'p1',
@@ -60,7 +58,7 @@ export const MOCK_PRODUCTS: Product[] = [
     overview: null,
     inStock: true,
     storeId: 's2',
-    category: { id: 1, category_name: 'Jackets', category_title: 'کت و کاپشن' },
+    category: { id: 1, category_name: 'کت و کاپشن', category_parent: 'لباس' },
     colors: [
       { id: 1, color_name: 'مشکی', color_hex: '#000000' },
       { id: 2, color_name: 'قهوه‌ای', color_hex: '#5D4037' },
@@ -79,7 +77,7 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 2800000,
     finalPrice: 2800000,
     image: 'https://picsum.photos/400/500?random=11',
-    category: { id: 2, category_name: 'Womenswear', category_title: 'لباس زنانه' },
+    category: { id: 2, category_name: 'پیراهن', category_parent: 'لباس' },
     storeId: 's1',
     description: 'پیراهن بلند مشکی با سنگ دوزی دستی. طراحی سال ۲۰۲۴. مناسب برای مجالس رسمی.',
     inStock: true,
@@ -101,7 +99,7 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 980000,
     finalPrice: 980000,
     image: 'https://picsum.photos/400/500?random=12',
-    category: { id: 3, category_name: 'Trousers', category_title: 'شلوار' },
+    category: { id: 3, category_name: 'شلوار', category_parent: 'لباس' },
     storeId: 's3',
     inStock: true,
     description: 'شلوار جین با کیفیت بالا و دوخت صنعتی. رنگ ثابت.',
@@ -113,7 +111,7 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 1500000,
     finalPrice: 1500000,
     image: 'https://picsum.photos/400/500?random=13',
-    category: { id: 4, category_name: 'Accessories', category_title: 'اکسسوری' },
+    category: { id: 4, category_name: 'کیف دستی', category_parent: 'اکسسوری' },
     storeId: 's2',
     inStock: true,
     description: 'کیف دستی زنانه مناسب برای استفاده روزمره و اداری.',
@@ -125,7 +123,7 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 1200000,
     finalPrice: 1200000,
     image: 'https://picsum.photos/400/500?random=14',
-    category: { id: 2, category_name: 'Womenswear', category_title: 'لباس زنانه' },
+    category: { id: 2, category_name: 'مانتو', category_parent: 'لباس' },
     storeId: 's1',
     inStock: false,
     description: 'مانتو بسیار خنک و سبک از جنس الیاف طبیعی.',
@@ -137,10 +135,10 @@ export const MOCK_PRODUCTS: Product[] = [
     price: 2100000,
     finalPrice: 2100000,
     image: 'https://picsum.photos/400/500?random=15',
-    category: { id: 5, category_name: 'Shoes', category_title: 'کفش' },
+    category: { id: 5, category_name: 'کفش ورزشی', category_parent: 'کفش' },
     storeId: 's3',
     inStock: true,
-    description: 'راحت و طبی، مناسب پیاده‌روی طولانی.',
+    description: 'راحت و طبی, مناسب پیاده‌روی طولانی.',
     overview: null,
   },
 ];

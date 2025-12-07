@@ -1,0 +1,109 @@
+
+/*
+   SECONDARY SIDEBAR
+   - Mobile: A sticky sub-header for filters.
+   - Desktop: A second, dedicated filter sidebar.
+*/
+
+.secondary-sidebar {
+  /* Default: Mobile as a sub-header */
+  width: 100%;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0.75rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+}
+
+.secondary-sidebar-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  overflow-x: auto; /* Allow horizontal scroll for multiple dropdowns if needed on mobile */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.secondary-sidebar-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* On mobile, we hide titles */
+.secondary-sidebar .filter-header,
+.secondary-sidebar .filter-title { 
+  display: none; 
+}
+
+.secondary-sidebar .filter-group {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1; /* Allow dropdown to take space */
+  min-width: 200px;
+}
+
+.secondary-sidebar .sort-select {
+  flex-shrink: 0;
+  width: 9rem;
+}
+
+.secondary-sidebar .sort-group {
+  margin-right: auto;
+  min-width: auto;
+  flex: 0 0 auto;
+}
+
+/* --- Desktop View --- */
+@media (min-width: 1024px) {
+  .secondary-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: var(--secondary-sidebar-width);
+    border-left: 1px solid var(--border-light);
+    border-bottom: none;
+    padding: 2rem;
+    overflow-y: auto;
+    z-index: auto;
+  }
+
+  .secondary-sidebar-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll on desktop */
+    overflow-y: visible; /* Allow dropdowns to overflow */
+  }
+  
+  .secondary-sidebar .filter-header,
+  .secondary-sidebar .filter-title {
+    display: flex;
+  }
+
+  .secondary-sidebar .filter-header {
+     margin-bottom: 1.5rem;
+     padding-bottom: 1rem;
+     border-bottom: 1px solid var(--border-light);
+  }
+
+  .secondary-sidebar .filter-title {
+     margin-bottom: 1rem;
+  }
+  
+  .secondary-sidebar .filter-group {
+    margin-bottom: 2rem;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 0 0 auto;
+    min-width: 100%;
+  }
+  
+  .secondary-sidebar .sort-select {
+    width: 100%;
+  }
+
+  .secondary-sidebar .sort-group {
+    margin-right: 0;
+  }
+}

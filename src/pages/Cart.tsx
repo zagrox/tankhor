@@ -85,8 +85,8 @@ const Cart: React.FC = () => {
                     <Link to={`/product/${product.id}`}>
                       <h3>{product.name}</h3>
                     </Link>
-                    {/* FIX: Render the `category_title` property of the `product.category` object, not the object itself. */}
-                    <span className="text-sm text-gray-500">{product.category?.category_title}</span>
+                    {/* FIX: Render the `category_name` property of the `product.category` object, not the object itself. */}
+                    <span className="text-sm text-gray-500">{product.category?.category_name}</span>
                     <div className="trust-badge-mini">
                       <ShieldCheck size={14} className="text-green-500" />
                       <span>گارانتی اصالت و سلامت</span>

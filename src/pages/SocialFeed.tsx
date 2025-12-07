@@ -1,8 +1,6 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { fetchStores } from '../lib/directus';
+import { fetchStores } from '../services/storeService';
 import { Store as StoreType } from '../types';
 import { MOCK_POSTS, MOCK_PRODUCTS } from '../constants'; // Posts are still mock
 import { Heart, MessageCircle, Share2, ShoppingBag, MoreHorizontal } from 'lucide-react';

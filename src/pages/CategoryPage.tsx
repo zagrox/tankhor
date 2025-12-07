@@ -1,10 +1,8 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Product } from '../types';
-import { fetchCategoryInfoAndProducts, CategoryType } from '../lib/directus';
+import { fetchCategoryInfoAndProducts, CategoryType } from '../services/categoryService';
 import { AlertCircle, ShoppingBag } from 'lucide-react';
 
 interface CategoryPageProps {
@@ -44,12 +42,14 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
     loadData();
   }, [type, slug, setIsLoading]);
 
+  // FIX: Added 'category' to the record to match the CategoryType definition.
   const typeTranslations: Record<CategoryType, string> = {
     season: 'فصل',
     style: 'سبک',
     material: 'جنس',
     gender: 'جنسیت',
-    vendor: 'نوع فروشگاه'
+    vendor: 'نوع فروشگاه',
+    category: 'دسته‌بندی'
   };
 
   const getCategoryTitle = () => {
@@ -98,8 +98,8 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
                     (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=No+Image';
                   }}
                 />
-                {/* FIX: Render the `category_title` property of the `product.category` object, not the object itself. */}
-                <div className="category-badge">{product.category?.category_title}</div>
+                {/* FIX: Render the `category_name` property of the `product.category` object, not the object itself. */}
+                <div className="category-badge">{product.category?.category_name}</div>
               </div>
               <div className="card-body">
                 <h3 className="card-title">{product.name}</h3>

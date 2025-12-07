@@ -1,13 +1,24 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { fetchAppConfiguration, getAssetUrl } from '../lib/directus';
-import { AppConfiguration } from '../types';
+import { fetchAppConfiguration } from '../services/configService';
+import { getAssetUrl } from '../services/client';
+import { fetchCategories } from '../services/categoryService';
+import { AppConfiguration, Category } from '../types';
+
+// Marketplace-specific types
+export type PriceSort = 'asc' | 'desc' | 'default';
 
 interface AppContextType {
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   appConfig: AppConfiguration | null;
   appLogo: string | null;
+
+  // Marketplace Filter State
+  selectedCategories: string[]; // Changed to array for multi-select
+  setSelectedCategories: (categories: string[]) => void;
+  priceSort: PriceSort;
+  setPriceSort: (sort: PriceSort) => void;
+  groupedCategories: Map<string, Category[]>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -17,24 +28,46 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [appConfig, setAppConfig] = useState<AppConfiguration | null>(null);
   const [appLogo, setAppLogo] = useState<string | null>(null);
 
+  // Marketplace Filter State
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [priceSort, setPriceSort] = useState<PriceSort>('default');
+  const [groupedCategories, setGroupedCategories] = useState<Map<string, Category[]>>(new Map());
+
+
   useEffect(() => {
-    // Fetch global app settings on initial load
-    const loadConfig = async () => {
+    // Fetch global app settings and categories on initial load
+    const loadInitialData = async () => {
       try {
-        const config = await fetchAppConfiguration();
+        const [config, categories] = await Promise.all([
+          fetchAppConfiguration(),
+          fetchCategories()
+        ]);
+
+        // Process config
         setAppConfig(config);
         if (config.app_logo) {
           setAppLogo(getAssetUrl(config.app_logo));
         }
+
+        // Process and group categories
+        const grouped = categories.reduce((acc, cat) => {
+          const parent = cat.category_parent || 'سایر';
+          if (!acc.has(parent)) {
+            acc.set(parent, []);
+          }
+          acc.get(parent)!.push(cat);
+          return acc;
+        }, new Map<string, Category[]>());
+        setGroupedCategories(grouped);
+
       } catch (error) {
-        console.error("Failed to fetch app configuration:", error);
+        console.error("Failed to fetch initial app data:", error);
       } finally {
-        // FIX: Ensure the loader is turned off after the initial config fetch.
         setIsLoading(false);
       }
     };
 
-    loadConfig();
+    loadInitialData();
   }, []);
 
   const value = {
@@ -42,6 +75,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setIsLoading,
     appConfig,
     appLogo,
+    selectedCategories,
+    setSelectedCategories,
+    priceSort,
+    setPriceSort,
+    groupedCategories,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

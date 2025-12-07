@@ -12,7 +12,9 @@ import './styles/global.css';
 /* Component Styles (Imported explicitly for robustness) */
 import './styles/components/Layout.css';
 import './styles/components/Sidebar.css';
-import './styles/components/Loader.css'; // Import new loader styles
+import './styles/components/Loader.css';
+import './styles/components/SecondarySidebar.css';
+import './styles/components/MultiSelectDropdown.css'; // Import new dropdown styles
 
 /* Page Styles */
 import './styles/pages/Home.css';

@@ -2,6 +2,7 @@
   /* --- Layout Dimensions --- */
   --sidebar-width: 17.5rem; /* 280px */
   --sidebar-width-collapsed: 5rem; /* 80px */
+  --secondary-sidebar-width: 18rem; /* 288px */
   --header-height-mobile: 4rem;
   
   /* --- Colors: Light Mode --- */

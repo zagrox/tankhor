@@ -1,8 +1,7 @@
-// FIX: Add missing import for React, useState, and useEffect to resolve reference errors.
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { fetchStoreBySlug } from '../lib/directus';
+import { fetchStoreBySlug } from '../services/storeService';
 import { Store, Product } from '../types';
 import { 
   Info, 

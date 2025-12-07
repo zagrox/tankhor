@@ -1,9 +1,7 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
-import { fetchProductById } from '../lib/directus';
+import { fetchProductById } from '../services/productService';
 import { Product, Color, Size } from '../types';
 import { 
   ShoppingBag, 

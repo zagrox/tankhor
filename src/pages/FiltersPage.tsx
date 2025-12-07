@@ -1,5 +1,3 @@
-
-
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -9,7 +7,7 @@ import {
   fetchMaterials, 
   fetchGenders,
   fetchVendors
-} from '../lib/directus';
+} from '../services/categoryService';
 import { Season, Style, Material, Gender, Vendor } from '../types';
 import { 
   Users, 
