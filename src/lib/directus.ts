@@ -247,9 +247,15 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
   const filterValue = type === 'gender' ? slug.toLowerCase() : fromSlug(slug);
 
   try {
+    // Define fields to fetch dynamically to avoid errors.
+    const fieldsToFetch: (string | Record<string, any>)[] = ['id', '*'];
+    if (type === 'vendor') {
+      fieldsToFetch.push('vendor_stores');
+    }
+
     // 1. Fetch category/vendor info to get its ID and related IDs
     const infoResult = await directus.request(readItems(meta.collection, {
-      fields: ['id', '*', 'vendor_stores'],
+      fields: fieldsToFetch,
       filter: { [meta.slugField]: { _eq: filterValue } },
       limit: 1,
     }));
