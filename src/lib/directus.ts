@@ -42,7 +42,6 @@ interface DirectusProduct {
 
 interface DirectusStore {
   id: number;
-  // FIX: Added `status` field to align with API filters.
   status: string;
   store_name: string;
   store_title?: string | null;
@@ -97,8 +96,6 @@ export const getAssetUrl = (id: string | undefined) => {
 
 // Configuration
 export const fetchAppConfiguration = async (): Promise<AppConfiguration> => {
-  // FIX: Cast the result from readSingleton to the expected AppConfiguration type
-  // because the SDK returns a generic object without an 'id' property for singletons.
   const config = await directus.request(readSingleton('configuration', {
     fields: ['*', 'app_logo']
   }));
@@ -109,8 +106,6 @@ export const fetchAppConfiguration = async (): Promise<AppConfiguration> => {
 export const fetchProducts = async (filter?: any): Promise<Product[]> => {
   try {
     const result = await directus.request(readItems('products', {
-      // FIX: Updated `fields` to use the new object syntax for relational data
-      // and added product_category to fix marketplace filtering.
       fields: [
         'id',
         'product_name',
@@ -122,13 +117,12 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
         { product_category: [{ category_id: ['*'] }] },
       ],
       filter: {
-        status: { _eq: 'published' }, // Only show published items
+        status: { _eq: 'published' }, 
         ...filter
       },
       sort: ['-date_created'] as any
     }));
     
-    // Map raw backend data to frontend interface
     return result.map(mapProductData);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -139,8 +133,6 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
 export const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
     const result = await directus.request(readItem('products', Number(id), {
-      // FIX: Updated `fields` to use the object syntax for deep-fetching relational data,
-      // which is the correct format for the Directus SDK.
       fields: [
         '*', 
         { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
@@ -165,8 +157,8 @@ export const fetchStores = async (): Promise<Store[]> => {
   try {
     const result = await directus.request(readItems('stores', {
       fields: ['id', 'store_name', 'store_slug', 'store_logo'],
-      filter: { status: { _eq: 'published' } as any }, // Cast to bypass strict type
-      limit: 10 // Limit for stories bar
+      filter: { status: { _eq: 'published' } as any }, 
+      limit: 10 
     }));
     return result.map(mapStoreData);
   } catch (error) {
@@ -181,7 +173,7 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
        fields: ['*'],
        filter: { 
          store_slug: { _eq: slug },
-         status: { _eq: 'published' } as any // Cast to bypass strict type
+         status: { _eq: 'published' } as any 
        },
        limit: 1,
     }));
@@ -263,12 +255,10 @@ export type CategoryType = 'season' | 'style' | 'material' | 'gender' | 'vendor'
 
 const fromSlug = (slug: string) => slug.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 
-// This metadata drives the filtering logic.
 type CollectionName = 'seasons' | 'styles' | 'material' | 'gender' | 'vendors';
 const categoryMeta: Record<CategoryType, { 
   collection: CollectionName; 
   slugField: string;                 
-  // M2M fields, not applicable to vendor
   productField?: string;
   junctionFK?: string;
 }> = {
@@ -286,13 +276,11 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
   const filterValue = type === 'gender' ? slug.toLowerCase() : fromSlug(slug);
 
   try {
-    // Define fields to fetch dynamically to avoid errors.
     const fieldsToFetch: (string | Record<string, any>)[] = ['id', '*'];
     if (type === 'vendor') {
       fieldsToFetch.push('vendor_stores');
     }
 
-    // 1. Fetch category/vendor info to get its ID and related IDs
     const infoResult = await directus.request(readItems(meta.collection, {
       fields: fieldsToFetch as any,
       filter: { [meta.slugField]: { _eq: filterValue } } as any,
@@ -305,11 +293,9 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
       return { info: null, products: [] };
     }
 
-    // 2. Build the correct filter for products based on the relationship
     let productFilter: any;
 
     if (type === 'vendor') {
-      // FIX: Cast to `unknown` first to satisfy strict type checking, as `info`'s type is not inferred correctly by the SDK with a dynamic collection.
       const vendorInfo = info as unknown as Vendor;
       const storeIds = vendorInfo.vendor_stores || [];
       if (storeIds.length === 0) {
@@ -324,7 +310,6 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
         }
       };
     } else {
-      // Standard M2M logic for other types (e.g., seasons, styles)
       if (!meta.productField || !meta.junctionFK) {
          throw new Error(`M2M metadata missing for type: ${type}`);
       }
@@ -339,7 +324,6 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
       };
     }
 
-    // 3. Fetch products using the correct filter
     const productsResult = await fetchProducts(productFilter);
 
     return { info, products: productsResult };
@@ -352,21 +336,22 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
 
 // --- Data Mappers ---
 
-const mapStoreData = (item: DirectusStore): Store => {
+// FIX: Updated function signature to accept Partial<DirectusStore> to resolve build errors.
+// This accurately reflects that list views fetch only a subset of fields.
+const mapStoreData = (item: Partial<DirectusStore>): Store => {
   return {
-    id: String(item.id),
-    name: item.store_name,
+    id: String(item.id!),
+    name: item.store_name!,
     title: item.store_title || undefined,
-    handle: `@${item.store_slug}`,
-    slug: item.store_slug,
-    avatar: getAssetUrl(item.store_logo),
+    handle: `@${item.store_slug!}`,
+    slug: item.store_slug!,
+    avatar: getAssetUrl(item.store_logo!),
     coverImage: 'https://picsum.photos/800/300?random=' + item.id, // placeholder
     followers: 12500, // mock
     isFollowing: false, // mock
     description: item.store_description || 'اطلاعات فروشگاه به زودی تکمیل می‌شود.',
     productIds: item.store_products || [],
     
-    // Map new contact fields
     channel: item.store_channel || undefined,
     instagram: item.store_instagram || undefined,
     website: item.store_website || undefined,
@@ -378,14 +363,16 @@ const mapStoreData = (item: DirectusStore): Store => {
   };
 };
 
-// Transforms Backend Schema (DirectusProduct) -> Frontend Schema (Product)
-const mapProductData = (item: DirectusProduct): Product => {
-  const price = Number(item.product_price || 0);
+// FIX: Updated function signature to accept Partial<DirectusProduct> to resolve build errors.
+// This makes the function compatible with both full (detail) and partial (list) API responses.
+const mapProductData = (item: Partial<DirectusProduct>): Product => {
+  // Use non-null assertions (!) for fields guaranteed to be present in list views.
+  const price = Number(item.product_price! || 0);
   const finalPrice = Number(item.product_discount || price);
   
   let discountPercentage: number | undefined = undefined;
-  if (price > 0 && finalPrice < price) {
-    discountPercentage = Math.round(((price - finalPrice) / price) * 100);
+  if (item.product_price && price > 0 && finalPrice < price) {
+    discountPercentage = Math.round(((price - finalPrice) / parseFloat(item.product_price)) * 100);
   }
 
   const storeData = item.product_store;
@@ -394,31 +381,30 @@ const mapProductData = (item: DirectusProduct): Product => {
   const storeSlug = typeof storeData === 'object' && storeData !== null ? storeData.store_slug : undefined;
   const storeAvatar = typeof storeData === 'object' && storeData !== null ? getAssetUrl(storeData.store_logo) : 'https://placehold.co/100?text=Store';
 
-  // Helper to extract nested M2M data from junction tables
-  const extractM2M = (junctions: any[], key: string): any[] => {
+  // Helper to safely extract nested M2M data from junction tables.
+  const extractM2M = (junctions: any[] | undefined, key: string): any[] => {
     if (!Array.isArray(junctions)) return [];
     return junctions.map(j => j[key]).filter(Boolean);
   };
 
   return {
-    id: String(item.id),
-    name: item.product_name,
-    description: item.product__description,
-    overview: item.product_overview,
-    image: getAssetUrl(item.product_image),
+    id: String(item.id!),
+    name: item.product_name!,
+    description: item.product__description || null,
+    overview: item.product_overview || null,
+    image: getAssetUrl(item.product_image!),
     
     price: price,
     finalPrice: finalPrice,
     discountPercentage: discountPercentage,
     
-    inStock: item.product_instock,
+    inStock: item.product_instock!,
     
-    storeId: storeId,
+    storeId: storeId!,
     storeName: storeName,
     storeSlug: storeSlug,
     storeAvatar: storeAvatar,
     
-    // Map the deep-fetched relational data
     category: extractM2M(item.product_category, 'category_id')[0],
     materials: extractM2M(item.product_materials, 'material_id'),
     colors: extractM2M(item.product_colors, 'colors_id'),
