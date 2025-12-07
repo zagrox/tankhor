@@ -1,6 +1,9 @@
 
 
 import React from 'react';
+// FIX: Switched from react-router-dom v5 to v6/v7 syntax to resolve module export errors.
+// This involves replacing `Switch` with `Routes`, `Redirect` with `Navigate`,
+// and using the `element` prop on `<Route>` instead of `component` or `render`.
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Layout from './components/Layout';
@@ -53,7 +56,7 @@ const App: React.FC = () => {
             <Route path="/privacy" element={<Placeholder title="حریم خصوصی" />} />
             <Route path="/terms" element={<Placeholder title="قوانین" />} />
             
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Layout>
       </AppProvider>
