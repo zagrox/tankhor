@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Filter, ArrowUpDown } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import MultiSelectDropdown from './MultiSelectDropdown';
 
 const SecondarySidebar: React.FC = () => {
@@ -34,12 +34,10 @@ const SecondarySidebar: React.FC = () => {
       <div className="secondary-sidebar-content">
         <div className="filter-header">
           <Filter size={20} className="text-secondary" />
-          <h2>فیلترها</h2>
+          <h2>فروشگاه</h2>
         </div>
         
         <div className="filter-group">
-          <span className="filter-title">دسته‌بندی‌ها</span>
-          
           <MultiSelectDropdown 
             label="انتخاب دسته‌بندی"
             groups={categoryGroups}
@@ -49,10 +47,6 @@ const SecondarySidebar: React.FC = () => {
         </div>
 
         <div className="filter-group sort-group">
-          <span className="filter-title flex items-center gap-2">
-            <ArrowUpDown size={14} />
-            مرتب‌سازی
-          </span>
           <select 
             value={priceSort}
             onChange={(e) => setPriceSort(e.target.value as any)}

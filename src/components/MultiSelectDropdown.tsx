@@ -1,6 +1,6 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, Search, X, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { ChevronDown, Search, X, Check, Minus } from 'lucide-react';
 
 interface Option {
   value: string;
@@ -28,15 +28,28 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   
-  // NOTE: Click-outside logic removed to act as an Accordion inside the sidebar.
-  // This allows the user to keep filters open while scrolling the sidebar.
-
   const toggleOption = (value: string) => {
     if (selectedValues.includes(value)) {
       onChange(selectedValues.filter((v) => v !== value));
     } else {
       onChange([...selectedValues, value]);
     }
+  };
+
+  const toggleGroup = (groupOptions: Option[]) => {
+    const groupValues = groupOptions.map(o => o.value);
+    const allSelected = groupValues.every(v => selectedValues.includes(v));
+
+    let newValues;
+    if (allSelected) {
+      // Deselect all in group
+      newValues = selectedValues.filter(v => !groupValues.includes(v));
+    } else {
+      // Select all in group (merge unique)
+      const uniqueValues = new Set([...selectedValues, ...groupValues]);
+      newValues = Array.from(uniqueValues);
+    }
+    onChange(newValues);
   };
 
   const clearSelection = (e: React.MouseEvent) => {
@@ -93,28 +106,48 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 
           <div className="dropdown-options-list">
             {filteredGroups.length > 0 ? (
-              filteredGroups.map((group) => (
-                <div key={group.label} className="option-group">
-                  <h4 className="group-header">{group.label}</h4>
-                  {group.options.map((option) => {
-                    const isSelected = selectedValues.includes(option.value);
-                    return (
-                      <label key={option.value} className={`option-item ${isSelected ? 'selected' : ''}`}>
-                        <div className="checkbox-custom">
-                          {isSelected && <Check size={12} />}
-                        </div>
-                        <input
-                          type="checkbox"
-                          checked={isSelected}
-                          onChange={() => toggleOption(option.value)}
-                          className="checkbox-input"
-                        />
-                        <span className="option-text">{option.label}</span>
-                      </label>
-                    );
-                  })}
-                </div>
-              ))
+              filteredGroups.map((group) => {
+                // Calculate group state
+                const groupValues = group.options.map(o => o.value);
+                const allSelected = groupValues.length > 0 && groupValues.every(v => selectedValues.includes(v));
+                const someSelected = groupValues.some(v => selectedValues.includes(v));
+                const isIndeterminate = someSelected && !allSelected;
+
+                return (
+                  <div key={group.label} className="option-group">
+                    {/* Interactive Group Header */}
+                    <div 
+                      className="group-header-row" 
+                      onClick={() => toggleGroup(group.options)}
+                    >
+                      <div className={`checkbox-custom ${allSelected || isIndeterminate ? 'selected' : ''}`}>
+                        {allSelected && <Check size={12} />}
+                        {isIndeterminate && <Minus size={12} />}
+                      </div>
+                      <span className="group-label">{group.label}</span>
+                    </div>
+
+                    {/* Options */}
+                    {group.options.map((option) => {
+                      const isSelected = selectedValues.includes(option.value);
+                      return (
+                        <label key={option.value} className={`option-item ${isSelected ? 'selected' : ''}`}>
+                          <div className="checkbox-custom">
+                            {isSelected && <Check size={12} />}
+                          </div>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleOption(option.value)}
+                            className="checkbox-input"
+                          />
+                          <span className="option-text">{option.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                );
+              })
             ) : (
               <div className="no-results">موردی یافت نشد</div>
             )}
