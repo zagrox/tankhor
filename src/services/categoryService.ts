@@ -105,9 +105,9 @@ export const fetchCategoryInfoAndProducts = async (type: CategoryType, slug: str
       fieldsToFetch.push('vendor_stores');
     }
 
-    // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
+    // FIX: Cast fieldsToFetch to any to bypass complex union type mismatch with Directus SDK QueryFields.
     const infoResult = await directus.request(readItems(meta.collection, {
-      fields: fieldsToFetch,
+      fields: fieldsToFetch as any,
       filter: { [meta.slugField]: { _eq: filterValue } },
       limit: 1,
     })) as unknown as any[];

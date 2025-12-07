@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Search, X, Check } from 'lucide-react';
 
@@ -26,19 +27,9 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  
+  // NOTE: Click-outside logic removed to act as an Accordion inside the sidebar.
+  // This allows the user to keep filters open while scrolling the sidebar.
 
   const toggleOption = (value: string) => {
     if (selectedValues.includes(value)) {
@@ -62,7 +53,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   })).filter(group => group.options.length > 0);
 
   return (
-    <div className="multi-select-dropdown" ref={dropdownRef}>
+    <div className="multi-select-dropdown">
       <button 
         className={`dropdown-trigger ${isOpen ? 'active' : ''}`} 
         onClick={() => setIsOpen(!isOpen)}

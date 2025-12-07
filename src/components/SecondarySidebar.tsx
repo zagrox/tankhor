@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Filter, ArrowUpDown } from 'lucide-react';
@@ -13,13 +14,20 @@ const SecondarySidebar: React.FC = () => {
   } = useAppContext();
 
   // Transform groupedCategories Map into the structure expected by MultiSelectDropdown
-  const categoryGroups = Array.from(groupedCategories.entries()).map(([parent, children]) => ({
-    label: parent,
-    options: children.map(cat => ({
-      value: String(cat.id),
-      label: cat.category_name
+  // And apply Smart Sorting: Parent categories alphabetical, but 'سایر' (Other) always last.
+  const categoryGroups = Array.from(groupedCategories.entries())
+    .map(([parent, children]) => ({
+      label: parent,
+      options: children.map(cat => ({
+        value: String(cat.id),
+        label: cat.category_name
+      }))
     }))
-  }));
+    .sort((a, b) => {
+      if (a.label === 'سایر') return 1;
+      if (b.label === 'سایر') return -1;
+      return a.label.localeCompare(b.label, 'fa');
+    });
 
   return (
     <aside className="secondary-sidebar">

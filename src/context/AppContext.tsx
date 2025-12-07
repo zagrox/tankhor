@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { fetchAppConfiguration } from '../services/configService';
 import { getAssetUrl } from '../services/client';
@@ -51,7 +52,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
         // Process and group categories
         const grouped = categories.reduce((acc, cat) => {
-          const parent = cat.category_parent || 'سایر';
+          // Explicitly fallback to 'سایر' if category_parent is null or empty
+          const parent = cat.category_parent ? cat.category_parent : 'سایر';
           if (!acc.has(parent)) {
             acc.set(parent, []);
           }

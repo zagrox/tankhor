@@ -17,6 +17,7 @@ import {
 export interface DirectusProduct {
   id: number;
   status: string;
+  date_created?: string; // Standard Directus field
   product_name: string;
   product__description: string | null;
   product_overview: string | null;
