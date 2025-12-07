@@ -31,13 +31,15 @@ interface DirectusProduct {
   product_store: any; // Can be ID or Store object
   
   // M2M junction fields (will contain relational objects after deep fetch)
-  product_category: { category_id: Category }[];
-  product_materials: { material_id: Material }[];
-  product_colors: { colors_id: Color }[];
-  product_sizes: { sizes_id: Size }[];
-  product_styles: { styles_id: Style }[];
-  product_seasons: { seasons_id: Season }[];
-  product_genders: { gender_id: Gender }[];
+  // FIX: Allow M2M relationship fields to be `null` to match data from the SDK.
+  // This resolves the strict type-checking error during the build process.
+  product_category: { category_id: Category }[] | null;
+  product_materials: { material_id: Material }[] | null;
+  product_colors: { colors_id: Color }[] | null;
+  product_sizes: { sizes_id: Size }[] | null;
+  product_styles: { styles_id: Style }[] | null;
+  product_seasons: { seasons_id: Season }[] | null;
+  product_genders: { gender_id: Gender }[] | null;
 }
 
 interface DirectusStore {
@@ -382,7 +384,7 @@ const mapProductData = (item: Partial<DirectusProduct>): Product => {
   const storeAvatar = typeof storeData === 'object' && storeData !== null ? getAssetUrl(storeData.store_logo) : 'https://placehold.co/100?text=Store';
 
   // Helper to safely extract nested M2M data from junction tables.
-  const extractM2M = (junctions: any[] | undefined, key: string): any[] => {
+  const extractM2M = (junctions: any[] | undefined | null, key: string): any[] => {
     if (!Array.isArray(junctions)) return [];
     return junctions.map(j => j[key]).filter(Boolean);
   };
