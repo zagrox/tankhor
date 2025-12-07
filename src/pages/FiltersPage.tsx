@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import { 
   fetchSeasons, 
   fetchStyles, 
@@ -11,7 +12,6 @@ import {
 } from '../lib/directus';
 import { Season, Style, Material, Gender, Vendor } from '../types';
 import { 
-  Loader2, 
   Users, 
   Sun, 
   Scissors, 
@@ -21,17 +21,16 @@ import {
 } from 'lucide-react';
 
 const FiltersPage: React.FC = () => {
+  const { setIsLoading, isLoading } = useAppContext();
   const [seasons, setSeasons] = useState<Season[]>([]);
   const [styles, setStyles] = useState<Style[]>([]);
   const [materials, setMaterials] = useState<Material[]>([]);
   const [genders, setGenders] = useState<Gender[]>([]);
   const [vendors, setVendors] = useState<Vendor[]>([]);
   
-  const [loading, setLoading] = useState(true);
-
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       try {
         const [
           seasonsData, 
@@ -55,19 +54,15 @@ const FiltersPage: React.FC = () => {
       } catch (error) {
         console.error("Failed to load filter data", error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [setIsLoading]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-[70vh]">
-        <Loader2 className="animate-spin text-secondary" size={48} />
-      </div>
-    );
+  if (isLoading) {
+    return null; // Global loader is active
   }
 
   const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');

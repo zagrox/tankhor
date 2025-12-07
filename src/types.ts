@@ -97,6 +97,7 @@ export interface BlogPost {
 
 export interface AppConfiguration {
   id: string;
+  app_logo?: string; // Added field for the global loader logo
   [key: string]: any;
 }
 

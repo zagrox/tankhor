@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -15,9 +16,11 @@ import {
   LayoutGrid,
   Users
 } from 'lucide-react';
+import { useAppContext } from '../context/AppContext';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
+  const { appLogo } = useAppContext(); // Get the app logo from context
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true); // Default to collapsed
 
@@ -65,8 +68,14 @@ const Sidebar: React.FC = () => {
       <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
         <div className="sidebar-header">
           <Link to="/" className="sidebar-logo">
-            <span className="logo-dot">.</span>
-            <span className="logo-text">تن‌خور</span>
+            {appLogo ? (
+              <img src={appLogo} alt="Tankhor Logo" className="sidebar-logo-img" />
+            ) : (
+              <>
+                <span className="logo-dot">.</span>
+                <span className="logo-text">تن‌خور</span>
+              </>
+            )}
           </Link>
           <button 
             onClick={() => setIsCollapsed(!isCollapsed)} 

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import { fetchProductById } from '../lib/directus';
 import { Product } from '../types';
 import { 
@@ -16,16 +17,15 @@ import {
   CheckCircle2,
   Minus,
   Plus,
-  Loader2,
   Info
 } from 'lucide-react';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const { setIsLoading, isLoading } = useAppContext();
   
   // State
   const [product, setProduct] = useState<Product | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Selection State
@@ -39,7 +39,7 @@ const ProductDetail: React.FC = () => {
     const loadProduct = async () => {
       if (!id) return;
       
-      setLoading(true);
+      setIsLoading(true);
       try {
         const data = await fetchProductById(id);
         
@@ -60,20 +60,17 @@ const ProductDetail: React.FC = () => {
         console.error(err);
         setError("خطا در دریافت اطلاعات محصول");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadProduct();
-  }, [id]);
+  }, [id, setIsLoading]);
 
-  if (loading) {
-    return (
-      <div className="product-loading-container">
-        <Loader2 className="animate-spin text-secondary" size={48} />
-        <p>در حال بارگذاری محصول...</p>
-      </div>
-    );
+  if (isLoading) {
+    // The global loader is now handling the loading state.
+    // This component can return null or a minimal skeleton if desired.
+    return null;
   }
 
   if (error || !product) {

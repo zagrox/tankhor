@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -11,6 +12,7 @@ import './styles/global.css';
 /* Component Styles (Imported explicitly for robustness) */
 import './styles/components/Layout.css';
 import './styles/components/Sidebar.css';
+import './styles/components/Loader.css'; // Import new loader styles
 
 /* Page Styles */
 import './styles/pages/Home.css';

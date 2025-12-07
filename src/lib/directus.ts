@@ -1,7 +1,5 @@
 
 
-
-
 import { createDirectus, rest, readItems, readSingleton, readItem } from '@directus/sdk';
 import { AppConfiguration, Product, Post, Store, BlogPost, Season, Style, Material, Gender, Vendor } from '../types';
 
@@ -86,7 +84,9 @@ export const getAssetUrl = (id: string | undefined) => {
 
 // Configuration
 export const fetchAppConfiguration = async () => {
-  return await directus.request(readSingleton('configuration'));
+  return await directus.request(readSingleton('configuration', {
+    fields: ['*', 'app_logo']
+  }));
 };
 
 // Products

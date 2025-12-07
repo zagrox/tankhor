@@ -1,13 +1,15 @@
+
 import React, { useState, useEffect } from 'react';
-import { fetchProducts } from '../lib/directus'; // Import API helper
+import { useAppContext } from '../context/AppContext';
+import { fetchProducts } from '../lib/directus'; 
 import { Product } from '../types';
-import { MOCK_PRODUCTS, MOCK_STORES } from '../constants'; // Keep MOCK_STORES for now until Stores are integrated
+import { MOCK_PRODUCTS, MOCK_STORES } from '../constants';
 import { Link } from 'react-router-dom';
-import { Filter, ShoppingBag, ArrowUpDown, Loader2 } from 'lucide-react';
+import { Filter, ShoppingBag, ArrowUpDown } from 'lucide-react';
 
 const Marketplace: React.FC = () => {
+  const { setIsLoading, isLoading } = useAppContext();
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -17,11 +19,9 @@ const Marketplace: React.FC = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        setLoading(true);
-        // Fetch real data from Directus
+        setIsLoading(true);
         const realProducts = await fetchProducts();
         
-        // Fallback to MOCK if DB is empty (for demo stability)
         if (!realProducts || realProducts.length === 0) {
           console.warn("No products found in Directus, using Mock data.");
           setProducts(MOCK_PRODUCTS);
@@ -31,15 +31,14 @@ const Marketplace: React.FC = () => {
       } catch (err) {
         console.error("Failed to fetch products:", err);
         setError("خطا در دریافت محصولات");
-        // Fallback on error
         setProducts(MOCK_PRODUCTS); 
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadData();
-  }, []);
+  }, [setIsLoading]);
 
   // Filter Logic (Client Side for now)
   const categories = ['همه', ...Array.from(new Set(products.map(p => p.category)))];
@@ -108,15 +107,11 @@ const Marketplace: React.FC = () => {
           <div className="products-header">
             <h1 className="products-title">محصولات برگزیده</h1>
             <span className="products-count">
-              {loading ? '...' : `${filteredProducts.length} کالا`}
+              {isLoading ? '...' : `${filteredProducts.length} کالا`}
             </span>
           </div>
 
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <Loader2 className="animate-spin text-secondary" size={48} />
-            </div>
-          ) : (
+          {!isLoading && (
             <div className="products-grid">
               {filteredProducts.map(product => {
                 // Temporary: Still matching mock stores until stores are integrated

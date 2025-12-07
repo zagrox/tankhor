@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AppProvider } from './context/AppContext';
 import Layout from './components/Layout';
+import Loader from './components/Loader';
 import SocialFeed from './pages/SocialFeed';
 import Marketplace from './pages/Marketplace';
 import ProductDetail from './pages/ProductDetail';
@@ -23,35 +25,38 @@ const Placeholder = ({ title }: { title: string }) => (
 const App: React.FC = () => {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/social" element={<SocialFeed />} />
-          <Route path="/marketplace" element={<Marketplace />} />
-          <Route path="/filters" element={<FiltersPage />} />
-          
-          {/* SEO-friendly Category Routes */}
-          <Route path="/seasons/:slug" element={<CategoryPage type="season" />} />
-          <Route path="/styles/:slug" element={<CategoryPage type="style" />} />
-          <Route path="/materials/:slug" element={<CategoryPage type="material" />} />
-          <Route path="/genders/:slug" element={<CategoryPage type="gender" />} />
-          <Route path="/vendors/:slug" element={<CategoryPage type="vendor" />} />
+      <AppProvider>
+        <Loader />
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/social" element={<SocialFeed />} />
+            <Route path="/marketplace" element={<Marketplace />} />
+            <Route path="/filters" element={<FiltersPage />} />
+            
+            {/* SEO-friendly Category Routes */}
+            <Route path="/seasons/:slug" element={<CategoryPage type="season" />} />
+            <Route path="/styles/:slug" element={<CategoryPage type="style" />} />
+            <Route path="/materials/:slug" element={<CategoryPage type="material" />} />
+            <Route path="/genders/:slug" element={<CategoryPage type="gender" />} />
+            <Route path="/vendors/:slug" element={<CategoryPage type="vendor" />} />
 
-          <Route path="/product/:id" element={<ProductDetail />} />
-          {/* Changed store route to use slug for SEO */}
-          <Route path="/stores/:slug" element={<StoreProfile />} />
-          <Route path="/blog" element={<Blog />} />
-          
-          <Route path="/cart" element={<Cart />} />
-          
-          <Route path="/contact" element={<Placeholder title="تماس با ما" />} />
-          <Route path="/about" element={<Placeholder title="درباره ما" />} />
-          <Route path="/privacy" element={<Placeholder title="حریم خصوصی" />} />
-          <Route path="/terms" element={<Placeholder title="قوانین" />} />
-          
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Layout>
+            <Route path="/product/:id" element={<ProductDetail />} />
+            {/* Changed store route to use slug for SEO */}
+            <Route path="/stores/:slug" element={<StoreProfile />} />
+            <Route path="/blog" element={<Blog />} />
+            
+            <Route path="/cart" element={<Cart />} />
+            
+            <Route path="/contact" element={<Placeholder title="تماس با ما" />} />
+            <Route path="/about" element={<Placeholder title="درباره ما" />} />
+            <Route path="/privacy" element={<Placeholder title="حریم خصوصی" />} />
+            <Route path="/terms" element={<Placeholder title="قوانین" />} />
+            
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Layout>
+      </AppProvider>
     </Router>
   );
 };

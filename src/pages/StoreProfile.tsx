@@ -1,6 +1,7 @@
 // FIX: Add missing import for React, useState, and useEffect to resolve reference errors.
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import { fetchStoreBySlug } from '../lib/directus';
 import { Store, Product } from '../types';
 import { 
@@ -9,7 +10,6 @@ import {
   Grid, 
   Check, 
   Heart, 
-  Loader2,
   AlertCircle,
   Contact,
   Globe,
@@ -22,17 +22,17 @@ import {
 
 const StoreProfile: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const { setIsLoading, isLoading } = useAppContext();
   
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) return;
 
     const loadData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       try {
         const { store: fetchedStore, products: fetchedProducts } = await fetchStoreBySlug(slug);
@@ -46,20 +46,15 @@ const StoreProfile: React.FC = () => {
         console.error("Failed to load store data:", err);
         setError("خطا در دریافت اطلاعات فروشگاه.");
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadData();
-  }, [slug]);
+  }, [slug, setIsLoading]);
 
-  if (loading) {
-    return (
-      <div className="flex flex-col justify-center items-center h-[70vh] gap-4">
-        <Loader2 className="animate-spin text-secondary" size={48} />
-        <p>در حال بارگذاری پروفایل فروشگاه...</p>
-      </div>
-    );
+  if (isLoading) {
+    return null; // Global loader is active
   }
 
   if (error || !store) {

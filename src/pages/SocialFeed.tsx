@@ -1,53 +1,48 @@
 
 
 import React, { useState, useEffect } from 'react';
+import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../lib/directus';
 import { Store as StoreType } from '../types';
 import { MOCK_POSTS, MOCK_PRODUCTS } from '../constants'; // Posts are still mock
-import { Heart, MessageCircle, Share2, ShoppingBag, MoreHorizontal, Loader2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingBag, MoreHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const SocialFeed: React.FC = () => {
+  const { setIsLoading } = useAppContext();
   const [stores, setStores] = useState<StoreType[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadStores = async () => {
-      setLoading(true);
+      setIsLoading(true);
       const fetchedStores = await fetchStores();
       setStores(fetchedStores);
-      setLoading(false);
+      setIsLoading(false);
     };
     loadStores();
-  }, []);
+  }, [setIsLoading]);
 
   return (
     <div className="social-page">
       
       {/* Stories */}
       <div className="stories-container">
-        {loading ? (
-          <div className="flex justify-center items-center w-full h-[70px]">
-            <Loader2 className="animate-spin text-secondary" />
-          </div>
-        ) : (
-          <div className="stories-scroll">
-            {stores.map((store) => (
-              <Link to={`/stores/${store.slug}`} key={store.id} className="story-card">
-                <div className="story-ring">
-                  <img 
-                    src={store.avatar} 
-                    alt={store.name} 
-                    className="story-img" 
-                  />
-                </div>
-                <span className="story-username">
-                  {store.name}
-                </span>
-              </Link>
-            ))}
-          </div>
-        )}
+        <div className="stories-scroll">
+          {stores.map((store) => (
+            <Link to={`/stores/${store.slug}`} key={store.id} className="story-card">
+              <div className="story-ring">
+                <img 
+                  src={store.avatar} 
+                  alt={store.name} 
+                  className="story-img" 
+                />
+              </div>
+              <span className="story-username">
+                {store.name}
+              </span>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Feed */}

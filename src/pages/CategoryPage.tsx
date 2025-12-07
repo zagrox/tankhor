@@ -1,9 +1,11 @@
 
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useAppContext } from '../context/AppContext';
 import { Product } from '../types';
 import { fetchCategoryInfoAndProducts, CategoryType } from '../lib/directus';
-import { Loader2, AlertCircle, ShoppingBag } from 'lucide-react';
+import { AlertCircle, ShoppingBag } from 'lucide-react';
 
 interface CategoryPageProps {
   type: CategoryType;
@@ -11,16 +13,16 @@ interface CategoryPageProps {
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
   const { slug } = useParams<{ slug: string }>();
+  const { setIsLoading, isLoading } = useAppContext();
   const [products, setProducts] = useState<Product[]>([]);
   const [categoryInfo, setCategoryInfo] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!slug) return;
 
     const loadData = async () => {
-      setLoading(true);
+      setIsLoading(true);
       setError(null);
       try {
         const { info, products: fetchedProducts } = await fetchCategoryInfoAndProducts(type, slug);
@@ -35,12 +37,12 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
         console.error(`Failed to load data for ${type}/${slug}`, err);
         setError('خطا در دریافت اطلاعات.');
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
     loadData();
-  }, [type, slug]);
+  }, [type, slug, setIsLoading]);
 
   const typeTranslations: Record<CategoryType, string> = {
     season: 'فصل',
@@ -62,13 +64,8 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="category-page-status">
-        <Loader2 className="animate-spin text-secondary" size={48} />
-        <p>در حال بارگذاری محصولات...</p>
-      </div>
-    );
+  if (isLoading) {
+    return null; // Global loader is active
   }
 
   if (error) {
