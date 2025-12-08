@@ -100,7 +100,7 @@ const FiltersPage: React.FC = () => {
       <section className="filter-section">
         <div className="section-title-row">
           <Layers size={24} className="text-secondary" />
-          <h2>جنس پارچه</h2>
+          <h2>جنس و پارچه</h2>
         </div>
         <div className="chips-grid">
           {materials.map((mat) => (

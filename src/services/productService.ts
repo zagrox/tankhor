@@ -36,6 +36,8 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
     return [];
   };
 
+  const relatedReelIds = extractM2M(item.product_reels, 'reels_id').map((r: any) => r.id);
+
   return {
     id: String(item.id!),
     name: item.product_name!,
@@ -62,6 +64,7 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
     styles: extractM2M(item.product_styles, 'styles_id'),
     seasons: extractM2M(item.product_seasons, 'seasons_id'),
     genders: extractM2M(item.product_genders, 'gender_id'),
+    relatedReelIds: relatedReelIds,
   };
 };
 
@@ -90,6 +93,7 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
         { product_materials: [{ material_id: ['*'] }] },
         { product_genders: [{ gender_id: ['*'] }] },
         { product_colors: [{ colors_id: ['*'] }] },
+        { product_reels: [{ reels_id: ['id'] }] }, // Fetch related reel IDs
       ],
       filter: {
         status: { _eq: 'published' },
@@ -122,6 +126,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
         { product_seasons: [{ seasons_id: ['*'] }] },
         { product_genders: [{ gender_id: ['*'] }] },
         { product_colors: [{ colors_id: ['*'] }] },
+        { product_reels: [{ reels_id: ['id'] }] },
       ]
     })) as unknown as DirectusProduct;
 

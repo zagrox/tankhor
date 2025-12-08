@@ -1,25 +1,49 @@
+
 .social-page {
-  max-width: 42rem; /* 672px */
+  /* Enforce full viewport height for the scrolling container */
+  height: 100dvh; 
+  width: 100%;
+  max-width: 30rem; /* Keep mobile width constraint on desktop */
   margin: 0 auto;
-  padding: 2rem 1rem;
+  
+  /* Enable Scroll Snap */
+  overflow-y: scroll;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  
+  /* Hide Scrollbar */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  
+  padding: 0;
+  position: relative;
+}
+
+.social-page::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 /* Stories */
 .stories-container {
   position: relative;
-  margin-bottom: 2.5rem;
+  padding: 1rem 0.5rem;
+  /* Make stories the first snap point */
+  scroll-snap-align: start;
+  min-height: auto;
+  background: transparent; /* overlay on background if needed */
+  z-index: 5;
 }
 
 .stories-scroll {
   display: flex;
-  gap: 1.5rem;
+  gap: 1rem;
   overflow-x: auto;
-  padding-bottom: 1rem;
+  padding-bottom: 0.5rem;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   scroll-snap-type: x mandatory;
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .stories-scroll::-webkit-scrollbar {
@@ -34,18 +58,14 @@
   flex-shrink: 0;
   scroll-snap-align: start;
   text-decoration: none;
-  transition: transform 0.2s ease;
-}
-
-.story-card:hover {
-  transform: scale(1.05);
+  width: 4.5rem;
 }
 
 .story-ring {
-  width: 70px;
-  height: 70px;
+  width: 4.2rem;
+  height: 4.2rem;
   border-radius: 50%;
-  padding: 3px;
+  padding: 2px;
   background: linear-gradient(to top right, #fbbf24, #f97316, #9333ea);
 }
 
@@ -53,174 +73,330 @@
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  border: 3px solid var(--bg-body);
+  border: 2px solid var(--bg-body);
   object-fit: cover;
   background-color: var(--bg-surface);
 }
 
 .story-username {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 500;
   color: var(--text-main);
   text-align: center;
-  width: 4rem;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-/* Feed Post */
-.feed-post {
-  background-color: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-2xl);
-  margin-bottom: 3rem;
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+/* --- REEL POST (Instagram Style) --- */
+
+.feed-list {
+  /* The feed list flows naturally inside the .social-page container */
+  display: flex;
+  flex-direction: column;
 }
 
-.post-header {
+.feed-post-reel {
+  position: relative;
+  width: 100%;
+  
+  /* Full Viewport Height for Immersive Feel */
+  height: 100dvh; 
+  
+  background-color: black;
+  
+  /* Scroll Snap Logic */
+  scroll-snap-align: start;
+  scroll-snap-stop: always; /* Force stop on each post */
+  
+  margin-bottom: 0; /* No margin between reels */
+  
+  /* Remove border radius for full screen feel on mobile */
+  border-radius: 0; 
+  
+  overflow: hidden;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 1rem;
+  justify-content: center;
 }
 
-.post-author {
+@media (min-width: 768px) {
+  /* On desktop, we can keep the rounded corners and spacing if desired, 
+     or keep it full screen. Let's keep it full screen logic but contained. */
+  .feed-post-reel {
+    height: 100dvh;
+    border-radius: 0; 
+    margin-bottom: 0;
+    box-shadow: none;
+  }
+}
+
+.reel-media-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  cursor: pointer;
+}
+
+.reel-video, 
+.reel-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures video fills the screen */
+  display: block;
+}
+
+/* Gradient Overlay - Essential for text readability */
+.reel-gradient-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%; /* Reduced height slightly */
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, transparent 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Center Play/Pause Icon */
+.center-play-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 10;
+}
+
+.center-play-icon.animate {
+  opacity: 0.8;
+  transform: scale(1);
+}
+
+/* --- ACTIONS SIDEBAR (Left side for RTL) --- */
+.reel-actions-sidebar {
+  position: absolute;
+  bottom: 1.5rem; /* Moved lower down */
+  left: 0.75rem; /* In RTL, 'left' is physically left */
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  z-index: 20;
+  align-items: center;
+}
+
+.action-btn-vertical {
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.action-btn-vertical:active {
+  transform: scale(0.9);
+}
+
+.action-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.shop-btn {
+  /* Highlight the shop button slightly */
+}
+
+/* --- BOTTOM CONTENT OVERLAY --- */
+.reel-content-overlay {
+  position: absolute;
+  bottom: 0;
+  right: 0; /* Text starts from right in RTL */
+  left: 3.5rem; /* Leave space for actions on left */
+  padding: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  text-align: right;
+  direction: rtl;
+  width: calc(100% - 3.5rem); /* Ensure full width minus sidebar */
+  padding-bottom: 2rem; /* Add padding for mobile nav area safety */
+}
+
+/* User Info Row */
+.reel-user-row {
   display: flex;
   align-items: center;
   gap: 0.75rem;
 }
 
-.post-avatar {
+.reel-avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  border: 2px solid white;
+  object-fit: cover;
+}
+
+.reel-username {
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-decoration: none;
+}
+
+.reel-follow-btn {
+  background-color: transparent;
+  border: 1px solid rgba(255,255,255,0.6);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+}
+
+/* Caption Text */
+.reel-caption-container {
+  max-width: 100%;
+}
+
+.reel-caption-text {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Truncate initially */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  cursor: pointer;
+  margin: 0;
+}
+
+.reel-caption-text.expanded {
+  -webkit-line-clamp: unset;
+}
+
+/* --- Linked Products (Vertical Glass Stack) --- */
+.reel-products-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.product-glass-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(30, 30, 30, 0.6); /* Dark semi-transparent */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-xl);
+  padding: 0.5rem;
+  text-decoration: none;
+  width: 100%;
+  transition: background-color 0.2s;
+}
+
+.product-glass-card:active {
+  background-color: rgba(30, 30, 30, 0.8);
+}
+
+.glass-card-img-wrapper {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: white;
 }
 
-.post-author-info h3 {
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: var(--text-main);
-  margin: 0;
-}
-
-.post-author-info p {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin: 0;
-}
-
-.post-media {
-  width: 100%;
-  aspect-ratio: 4 / 5;
-  background-color: var(--bg-surface);
-}
-
-.post-media img {
+.glass-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.post-content {
-  padding: 1.25rem;
-}
-
-.action-bar {
+.glass-card-info {
+  flex-grow: 1;
   display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  margin-bottom: 1rem;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: var(--text-main);
-  padding: 0;
-  transition: transform 0.1s, color 0.2s;
-}
-
-.action-btn:hover {
-  transform: scale(1.1);
-  color: var(--color-secondary);
-}
-
-.likes-count {
-  display: block;
+.glass-card-name {
+  font-size: 0.8rem;
   font-weight: 700;
-  font-size: 0.875rem;
-  color: var(--text-main);
-  margin-bottom: 0.5rem;
+  color: white;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0.1rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-.caption-text {
-  display: block;
-  font-size: 0.875rem;
-  color: var(--text-main);
-  line-height: 1.6;
-  margin-bottom: 1rem;
-}
-
-.caption-username {
-  font-weight: 700;
-  margin-left: 0.5rem;
-}
-
-/* Tagged Products */
-.tagged-products {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--border-light);
-}
-
-.tagged-label {
-  display: block;
+.glass-card-price {
   font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  margin-bottom: 0.75rem;
-}
-
-.product-tag {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem;
-  border-radius: var(--radius-lg);
-  text-decoration: none;
-  transition: background-color 0.2s;
-}
-
-.product-tag:hover {
-  background-color: var(--bg-surface);
-}
-
-.tag-img {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 0.5rem;
-  object-fit: cover;
-}
-
-.tag-info h4 {
-  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
-  color: var(--text-main);
-  margin: 0;
 }
 
-.tag-info p {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-  margin: 0;
+.glass-card-action {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-lg);
+  color: white;
 }
 
-.tag-icon {
-  margin-right: auto;
-  color: var(--text-muted);
+.glass-btn-text {
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+
+/* Feed Loader */
+.feed-loader {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  /* Ensure loader snaps to view if it's the last item */
+  scroll-snap-align: center; 
+}
+
+.loader-spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid rgba(255,255,255,0.2);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.end-msg {
+  color: rgba(255,255,255,0.5);
+  font-size: 0.875rem;
+  padding-bottom: 4rem; /* Add padding for bottom nav visibility */
 }

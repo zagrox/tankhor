@@ -14,6 +14,21 @@ import {
 
 // This file contains the RAW type definitions that match the Directus API response.
 
+export interface DirectusFile {
+  id: string;
+  type: string;
+}
+
+export interface DirectusReel {
+  id: number;
+  status: string;
+  date_created: string;
+  reel_caption: string | null;
+  reel_file: string | DirectusFile; // UUID of the file or Expanded Object
+  reel_store: number | DirectusStore; // ID or Expanded Object
+  reel_like: number;
+}
+
 export interface DirectusProduct {
   id: number;
   status: string;
@@ -37,6 +52,9 @@ export interface DirectusProduct {
   product_styles: { styles_id: Style }[] | null;
   product_seasons: { seasons_id: Season }[] | null;
   product_genders: { gender_id: Gender }[] | null;
+  
+  // Added Reels Relation
+  product_reels: { reels_id: DirectusReel | number }[] | null;
 }
 
 export interface DirectusStore {
@@ -48,6 +66,9 @@ export interface DirectusStore {
   store_logo: string;
   store_slug: string;
   store_products: number[];
+  
+  // Added Reels Relation
+  store_reels: number[] | { reels_id: number }[] | null;
 
   // New Contact/Social Fields
   store_channel?: string;
@@ -68,6 +89,9 @@ export interface DirectusSchema {
   stores: DirectusStore[];
   posts: Post[];
   blog_posts: BlogPost[];
+  
+  // New Collection
+  reels: DirectusReel[];
 
   // Filter Collections
   category: Category[];

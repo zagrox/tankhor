@@ -140,7 +140,7 @@ const SecondarySidebar: React.FC = () => {
       <div className="secondary-sidebar-content">
         <div className="filter-header">
           <Filter size={20} className="text-secondary" />
-          <h2>فروشگاه</h2>
+          <h2> فروشگاه تن‌خور</h2>
         </div>
         
         <div className="filter-group">
@@ -172,7 +172,7 @@ const SecondarySidebar: React.FC = () => {
 
         <div className="filter-group">
            <MultiSelectDropdown 
-            label="انتخاب نوع فروشگاه"
+            label="انتخاب فروشگاه"
             groups={vendorGroups}
             selectedValues={selectedVendors}
             onChange={setSelectedVendors}

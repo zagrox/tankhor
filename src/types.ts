@@ -51,6 +51,9 @@ export interface Product {
   styles?: Style[];
   seasons?: Season[];
   genders?: Gender[];
+  
+  // Linked Reels (IDs)
+  relatedReelIds?: number[];
 }
 
 
@@ -88,6 +91,24 @@ export interface Post {
   likes: number;
   comments: number;
   linkedProductIds?: string[]; // IDs of products tagged in the post
+}
+
+// New Reel Interface
+export interface Reel {
+  id: number;
+  caption: string;
+  media: string; // URL to the image/video
+  mimeType?: string; // Type of the media file (e.g. video/mp4, image/jpeg)
+  likes: number;
+  date: string;
+  store: {
+    id: string;
+    name: string;
+    slug: string;
+    avatar: string;
+    handle: string;
+    coverImage?: string; // Added to match usage in SocialFeed
+  };
 }
 
 export interface CartItem extends Product {

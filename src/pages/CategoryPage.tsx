@@ -48,7 +48,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
     style: 'سبک',
     material: 'جنس',
     gender: 'جنسیت',
-    vendor: 'نوع فروشگاه',
+    vendor: 'فروشگاه',
     category: 'دسته‌بندی'
   };
 
