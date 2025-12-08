@@ -41,6 +41,7 @@ export interface Product {
   storeName?: string;
   storeSlug?: string;
   storeAvatar?: string;
+  storeVendor?: Vendor; // Added Vendor info for filtering
   
   // M2M Relational Attributes
   category?: Category; // Use the new Category interface
@@ -75,6 +76,8 @@ export interface Store {
   mobile?: string;
   address?: string;
   telegram?: string; // telegram support
+  
+  vendor?: Vendor;
 }
 
 export interface Post {

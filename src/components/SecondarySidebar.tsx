@@ -4,8 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Filter } from 'lucide-react';
 import MultiSelectDropdown from './MultiSelectDropdown';
-import { fetchSeasons, fetchStyles, fetchMaterials, fetchGenders, fetchColors } from '../services/categoryService';
-import { Season, Style, Material, Gender, Color } from '../types';
+import { fetchSeasons, fetchStyles, fetchMaterials, fetchGenders, fetchColors, fetchVendors } from '../services/categoryService';
+import { Season, Style, Material, Gender, Color, Vendor } from '../types';
 
 const SecondarySidebar: React.FC = () => {
   const { 
@@ -19,6 +19,8 @@ const SecondarySidebar: React.FC = () => {
     setSelectedMaterials,
     selectedGenders,
     setSelectedGenders,
+    selectedVendors,
+    setSelectedVendors,
     selectedColorFamilies,
     setSelectedColorFamilies,
     priceSort, 
@@ -31,22 +33,25 @@ const SecondarySidebar: React.FC = () => {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [genders, setGenders] = useState<Gender[]>([]);
   const [colors, setColors] = useState<Color[]>([]);
+  const [vendors, setVendors] = useState<Vendor[]>([]);
 
   useEffect(() => {
-    // Fetch available seasons, styles, materials, genders and colors for filtering
+    // Fetch available seasons, styles, materials, genders, colors and vendors for filtering
     const loadFilters = async () => {
-      const [seasonsData, stylesData, materialsData, gendersData, colorsData] = await Promise.all([
+      const [seasonsData, stylesData, materialsData, gendersData, colorsData, vendorsData] = await Promise.all([
         fetchSeasons(),
         fetchStyles(),
         fetchMaterials(),
         fetchGenders(),
-        fetchColors()
+        fetchColors(),
+        fetchVendors()
       ]);
       setSeasons(seasonsData);
       setStyles(stylesData);
       setMaterials(materialsData);
       setGenders(gendersData);
       setColors(colorsData);
+      setVendors(vendorsData);
     };
     loadFilters();
   }, []);
@@ -99,6 +104,14 @@ const SecondarySidebar: React.FC = () => {
     }))
   }];
 
+  const vendorGroups = [{
+    label: 'نوع فروشگاه',
+    options: vendors.map(v => ({
+      value: String(v.id),
+      label: v.vendor_title
+    }))
+  }];
+
   // Extract unique color families
   const uniqueColorFamilies = Array.from(new Set(
     colors.map(c => c.color_family).filter(Boolean)
@@ -135,6 +148,15 @@ const SecondarySidebar: React.FC = () => {
             groups={genderGroups}
             selectedValues={selectedGenders}
             onChange={setSelectedGenders}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب نوع فروشگاه"
+            groups={vendorGroups}
+            selectedValues={selectedVendors}
+            onChange={setSelectedVendors}
           />
         </div>
 

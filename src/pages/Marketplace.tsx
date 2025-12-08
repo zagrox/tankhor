@@ -17,6 +17,7 @@ const Marketplace: React.FC = () => {
     selectedStyles, // Get styles filter
     selectedMaterials, // Get materials filter
     selectedGenders, // Get genders filter
+    selectedVendors, // Get vendors filter
     selectedColorFamilies, // Get color families filter
     priceSort,
   } = useAppContext();
@@ -67,10 +68,13 @@ const Marketplace: React.FC = () => {
     // Gender Filter (M2M check)
     const genderMatch = selectedGenders.length === 0 || (p.genders && p.genders.some(g => selectedGenders.includes(String(g.id))));
 
+    // Vendor Filter (Check against storeVendor.id)
+    const vendorMatch = selectedVendors.length === 0 || (p.storeVendor && selectedVendors.includes(String(p.storeVendor.id)));
+
     // Color Family Filter (Check against color_family property)
     const colorMatch = selectedColorFamilies.length === 0 || (p.colors && p.colors.some(c => c.color_family && selectedColorFamilies.includes(c.color_family)));
 
-    return categoryMatch && seasonMatch && styleMatch && materialMatch && genderMatch && colorMatch;
+    return categoryMatch && seasonMatch && styleMatch && materialMatch && genderMatch && vendorMatch && colorMatch;
   }).sort((a, b) => {
     if (priceSort === 'asc') return a.finalPrice - b.finalPrice;
     if (priceSort === 'desc') return b.finalPrice - a.finalPrice;

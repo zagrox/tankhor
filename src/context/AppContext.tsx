@@ -31,6 +31,9 @@ interface AppContextType {
   selectedGenders: string[]; // Gender Filter
   setSelectedGenders: (genders: string[]) => void;
 
+  selectedVendors: string[]; // Vendor Filter
+  setSelectedVendors: (vendors: string[]) => void;
+
   selectedColorFamilies: string[]; // Color Family Filter
   setSelectedColorFamilies: (colors: string[]) => void;
 
@@ -52,6 +55,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+  const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
   const [selectedColorFamilies, setSelectedColorFamilies] = useState<string[]>([]);
   const [priceSort, setPriceSort] = useState<PriceSort>('default');
   const [groupedCategories, setGroupedCategories] = useState<Map<string, Category[]>>(new Map());
@@ -109,6 +113,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedMaterials,
     selectedGenders,
     setSelectedGenders,
+    selectedVendors,
+    setSelectedVendors,
     selectedColorFamilies,
     setSelectedColorFamilies,
     priceSort,

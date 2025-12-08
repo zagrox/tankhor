@@ -2,7 +2,7 @@
 
 import { readItems, readItem } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
-import { Product, Color, Size } from '../types';
+import { Product, Color, Size, Vendor } from '../types';
 import { DirectusProduct } from '../types/directus';
 
 // --- Data Mapper ---
@@ -25,6 +25,7 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
   const storeName = typeof storeData === 'object' && storeData !== null ? storeData.store_name : undefined;
   const storeSlug = typeof storeData === 'object' && storeData !== null ? storeData.store_slug : undefined;
   const storeAvatar = typeof storeData === 'object' && storeData !== null ? getAssetUrl(storeData.store_logo) : 'https://placehold.co/100?text=Store';
+  const storeVendor = (typeof storeData === 'object' && storeData !== null) ? (storeData.store_vendor as Vendor | undefined) : undefined;
   
   // Helper to safely extract M2M data
   const extractM2M = (junctions: any[] | undefined | null, key: string): any[] => {
@@ -52,6 +53,7 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
     storeName: storeName,
     storeSlug: storeSlug,
     storeAvatar: storeAvatar,
+    storeVendor: storeVendor,
 
     category: extractM2M(item.product_category, 'category_id')[0],
     materials: extractM2M(item.product_materials, 'material_id'),
@@ -80,7 +82,8 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
         'product_discount',
         'product_image',
         'product_instock',
-        { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
+        // Fetch nested vendor info from the store
+        { product_store: ['id', 'store_name', 'store_slug', 'store_logo', { store_vendor: ['id', 'vendor_name', 'vendor_title'] }] },
         { product_category: [{ category_id: ['*'] }] },
         { product_seasons: [{ seasons_id: ['*'] }] },
         { product_styles: [{ styles_id: ['*'] }] },
@@ -112,7 +115,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
     const productResult = await directus.request(readItem('products', Number(id), {
       fields: [
         '*',
-        { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
+        { product_store: ['id', 'store_name', 'store_slug', 'store_logo', { store_vendor: ['id', 'vendor_name', 'vendor_title'] }] },
         { product_category: [{ category_id: ['*'] }] },
         { product_materials: [{ material_id: ['*'] }] },
         { product_styles: [{ styles_id: ['*'] }] },

@@ -58,6 +58,8 @@ export interface DirectusStore {
   store_mobile?: string;
   store_address?: string;
   store_telegram?: string;
+  
+  store_vendor?: Vendor | null; // Relation to Vendors
 }
 
 export interface DirectusSchema {
