@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fetchProducts } from '../services/productService'; 
@@ -10,7 +12,12 @@ const Marketplace: React.FC = () => {
   const { 
     setIsLoading, 
     isLoading,
-    selectedCategories, // Updated from selectedCategory
+    selectedCategories, 
+    selectedSeasons, // Get seasons filter
+    selectedStyles, // Get styles filter
+    selectedMaterials, // Get materials filter
+    selectedGenders, // Get genders filter
+    selectedColorFamilies, // Get color families filter
     priceSort,
   } = useAppContext();
 
@@ -45,11 +52,25 @@ const Marketplace: React.FC = () => {
 
   // Filter Logic (Client Side) using global state
   const filteredProducts = products.filter(p => {
-    if (selectedCategories.length > 0) {
-      // Filter if product category ID is included in selected categories
-      return p.category && selectedCategories.includes(String(p.category.id));
-    }
-    return true;
+    // Category Filter
+    const categoryMatch = selectedCategories.length === 0 || (p.category && selectedCategories.includes(String(p.category.id)));
+    
+    // Season Filter (M2M check)
+    const seasonMatch = selectedSeasons.length === 0 || (p.seasons && p.seasons.some(s => selectedSeasons.includes(String(s.id))));
+
+    // Style Filter (M2M check)
+    const styleMatch = selectedStyles.length === 0 || (p.styles && p.styles.some(s => selectedStyles.includes(String(s.id))));
+
+    // Material Filter (M2M check)
+    const materialMatch = selectedMaterials.length === 0 || (p.materials && p.materials.some(m => selectedMaterials.includes(String(m.id))));
+
+    // Gender Filter (M2M check)
+    const genderMatch = selectedGenders.length === 0 || (p.genders && p.genders.some(g => selectedGenders.includes(String(g.id))));
+
+    // Color Family Filter (Check against color_family property)
+    const colorMatch = selectedColorFamilies.length === 0 || (p.colors && p.colors.some(c => c.color_family && selectedColorFamilies.includes(c.color_family)));
+
+    return categoryMatch && seasonMatch && styleMatch && materialMatch && genderMatch && colorMatch;
   }).sort((a, b) => {
     if (priceSort === 'asc') return a.finalPrice - b.finalPrice;
     if (priceSort === 'desc') return b.finalPrice - a.finalPrice;

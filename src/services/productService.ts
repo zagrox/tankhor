@@ -1,3 +1,5 @@
+
+
 import { readItems, readItem } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { Product, Color, Size } from '../types';
@@ -80,6 +82,11 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
         'product_instock',
         { product_store: ['id', 'store_name', 'store_slug', 'store_logo'] },
         { product_category: [{ category_id: ['*'] }] },
+        { product_seasons: [{ seasons_id: ['*'] }] },
+        { product_styles: [{ styles_id: ['*'] }] },
+        { product_materials: [{ material_id: ['*'] }] },
+        { product_genders: [{ gender_id: ['*'] }] },
+        { product_colors: [{ colors_id: ['*'] }] },
       ],
       filter: {
         status: { _eq: 'published' },
@@ -111,6 +118,7 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
         { product_styles: [{ styles_id: ['*'] }] },
         { product_seasons: [{ seasons_id: ['*'] }] },
         { product_genders: [{ gender_id: ['*'] }] },
+        { product_colors: [{ colors_id: ['*'] }] },
       ]
     })) as unknown as DirectusProduct;
 

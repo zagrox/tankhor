@@ -1,4 +1,5 @@
 
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { fetchAppConfiguration } from '../services/configService';
 import { getAssetUrl } from '../services/client';
@@ -17,6 +18,22 @@ interface AppContextType {
   // Marketplace Filter State
   selectedCategories: string[]; // Changed to array for multi-select
   setSelectedCategories: (categories: string[]) => void;
+  
+  selectedSeasons: string[]; // Season Filter
+  setSelectedSeasons: (seasons: string[]) => void;
+
+  selectedStyles: string[]; // Style Filter
+  setSelectedStyles: (styles: string[]) => void;
+
+  selectedMaterials: string[]; // Material Filter
+  setSelectedMaterials: (materials: string[]) => void;
+
+  selectedGenders: string[]; // Gender Filter
+  setSelectedGenders: (genders: string[]) => void;
+
+  selectedColorFamilies: string[]; // Color Family Filter
+  setSelectedColorFamilies: (colors: string[]) => void;
+
   priceSort: PriceSort;
   setPriceSort: (sort: PriceSort) => void;
   groupedCategories: Map<string, Category[]>;
@@ -31,6 +48,11 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
   // Marketplace Filter State
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSeasons, setSelectedSeasons] = useState<string[]>([]);
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
+  const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
+  const [selectedColorFamilies, setSelectedColorFamilies] = useState<string[]>([]);
   const [priceSort, setPriceSort] = useState<PriceSort>('default');
   const [groupedCategories, setGroupedCategories] = useState<Map<string, Category[]>>(new Map());
 
@@ -79,6 +101,16 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     appLogo,
     selectedCategories,
     setSelectedCategories,
+    selectedSeasons,
+    setSelectedSeasons,
+    selectedStyles,
+    setSelectedStyles,
+    selectedMaterials,
+    setSelectedMaterials,
+    selectedGenders,
+    setSelectedGenders,
+    selectedColorFamilies,
+    setSelectedColorFamilies,
     priceSort,
     setPriceSort,
     groupedCategories,

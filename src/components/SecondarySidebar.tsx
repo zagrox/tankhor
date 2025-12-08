@@ -1,17 +1,55 @@
 
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Filter } from 'lucide-react';
 import MultiSelectDropdown from './MultiSelectDropdown';
+import { fetchSeasons, fetchStyles, fetchMaterials, fetchGenders, fetchColors } from '../services/categoryService';
+import { Season, Style, Material, Gender, Color } from '../types';
 
 const SecondarySidebar: React.FC = () => {
   const { 
     selectedCategories, 
     setSelectedCategories, 
+    selectedSeasons,
+    setSelectedSeasons,
+    selectedStyles,
+    setSelectedStyles,
+    selectedMaterials,
+    setSelectedMaterials,
+    selectedGenders,
+    setSelectedGenders,
+    selectedColorFamilies,
+    setSelectedColorFamilies,
     priceSort, 
     setPriceSort,
     groupedCategories,
   } = useAppContext();
+
+  const [seasons, setSeasons] = useState<Season[]>([]);
+  const [styles, setStyles] = useState<Style[]>([]);
+  const [materials, setMaterials] = useState<Material[]>([]);
+  const [genders, setGenders] = useState<Gender[]>([]);
+  const [colors, setColors] = useState<Color[]>([]);
+
+  useEffect(() => {
+    // Fetch available seasons, styles, materials, genders and colors for filtering
+    const loadFilters = async () => {
+      const [seasonsData, stylesData, materialsData, gendersData, colorsData] = await Promise.all([
+        fetchSeasons(),
+        fetchStyles(),
+        fetchMaterials(),
+        fetchGenders(),
+        fetchColors()
+      ]);
+      setSeasons(seasonsData);
+      setStyles(stylesData);
+      setMaterials(materialsData);
+      setGenders(gendersData);
+      setColors(colorsData);
+    };
+    loadFilters();
+  }, []);
 
   // Transform groupedCategories Map into the structure expected by MultiSelectDropdown
   // And apply Smart Sorting: Parent categories alphabetical, but 'سایر' (Other) always last.
@@ -29,6 +67,51 @@ const SecondarySidebar: React.FC = () => {
       return a.label.localeCompare(b.label, 'fa');
     });
 
+  const seasonGroups = [{
+    label: 'فصل',
+    options: seasons.map(s => ({
+      value: String(s.id),
+      label: s.season_title
+    }))
+  }];
+
+  const styleGroups = [{
+    label: 'سبک',
+    options: styles.map(s => ({
+      value: String(s.id),
+      label: s.style_title
+    }))
+  }];
+
+  const materialGroups = [{
+    label: 'جنس',
+    options: materials.map(m => ({
+      value: String(m.id),
+      label: m.material_title
+    }))
+  }];
+
+  const genderGroups = [{
+    label: 'جنسیت',
+    options: genders.map(g => ({
+      value: String(g.id),
+      label: g.gender_title
+    }))
+  }];
+
+  // Extract unique color families
+  const uniqueColorFamilies = Array.from(new Set(
+    colors.map(c => c.color_family).filter(Boolean)
+  )).sort();
+
+  const colorGroups = [{
+    label: 'خانواده رنگ',
+    options: uniqueColorFamilies.map(f => ({
+      value: f!,
+      label: f!
+    }))
+  }];
+
   return (
     <aside className="secondary-sidebar">
       <div className="secondary-sidebar-content">
@@ -43,6 +126,51 @@ const SecondarySidebar: React.FC = () => {
             groups={categoryGroups}
             selectedValues={selectedCategories}
             onChange={setSelectedCategories}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب جنسیت"
+            groups={genderGroups}
+            selectedValues={selectedGenders}
+            onChange={setSelectedGenders}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب فصل"
+            groups={seasonGroups}
+            selectedValues={selectedSeasons}
+            onChange={setSelectedSeasons}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب سبک"
+            groups={styleGroups}
+            selectedValues={selectedStyles}
+            onChange={setSelectedStyles}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب جنس"
+            groups={materialGroups}
+            selectedValues={selectedMaterials}
+            onChange={setSelectedMaterials}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="انتخاب رنگ"
+            groups={colorGroups}
+            selectedValues={selectedColorFamilies}
+            onChange={setSelectedColorFamilies}
           />
         </div>
 

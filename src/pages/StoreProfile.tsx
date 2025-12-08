@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -35,6 +36,7 @@ const StoreProfile: React.FC = () => {
       setError(null);
       try {
         const { store: fetchedStore, products: fetchedProducts } = await fetchStoreBySlug(slug);
+        
         if (fetchedStore) {
           setStore(fetchedStore);
           setProducts(fetchedProducts);
@@ -114,8 +116,9 @@ const StoreProfile: React.FC = () => {
       {/* Main Grid */}
       <div className="content-grid">
         
-        {/* Right Sidebar (Info) */}
+        {/* Right Sidebar (Info & Stats) */}
         <aside className="info-sidebar">
+          
           <div className="info-card">
             <h3 className="info-title">
               <Info size={20} className="text-secondary" />
@@ -175,15 +178,13 @@ const StoreProfile: React.FC = () => {
               <h2 className="section-title">
                 <ShoppingBag size={22} className="text-gray-400" />
                 ویترین فروشگاه
+                <span className="text-sm font-normal text-gray-500 mr-2">({products.length})</span>
               </h2>
-              {products.length > 4 && (
-                 <Link to="/marketplace" className="text-sm text-secondary hover:underline">مشاهده همه</Link>
-              )}
             </div>
             
             {products.length > 0 ? (
               <div className="store-products-grid">
-                {products.slice(0, 6).map(product => ( // Show first 6 products
+                {products.map(product => (
                   <Link to={`/product/${product.id}`} key={product.id} className="mini-product">
                     <img src={product.image} alt={product.name} />
                     <div className="mini-product-info">
@@ -194,7 +195,11 @@ const StoreProfile: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-gray-500 py-8">این فروشگاه هنوز محصولی اضافه نکرده است.</div>
+              <div className="text-center text-gray-500 py-8">
+                 {products.length > 0 
+                   ? 'محصولی با این مشخصات یافت نشد.' 
+                   : 'این فروشگاه هنوز محصولی اضافه نکرده است.'}
+              </div>
             )}
           </section>
 

@@ -11,7 +11,10 @@ export interface Category {
 export interface Color {
   id: number;
   color_name: string;
-  color_hex: string;
+  color_title?: string;
+  color_hex?: string; // Kept for mock compatibility
+  color_decimal?: string; // From API
+  color_family?: string; // For filtering
 }
 
 export interface Size {

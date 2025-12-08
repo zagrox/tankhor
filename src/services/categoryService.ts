@@ -1,6 +1,8 @@
+
+
 import { readItems } from '@directus/sdk';
 import { directus } from './client';
-import { Season, Style, Material, Gender, Vendor, Category } from '../types';
+import { Season, Style, Material, Gender, Vendor, Category, Color } from '../types';
 import { fetchProducts } from './productService';
 
 // --- Simple Filter Collection Fetchers ---
@@ -51,6 +53,16 @@ export const fetchVendors = async (): Promise<Vendor[]> => {
     return await directus.request(readItems('vendors', { fields: ['*'] })) as unknown as Vendor[];
   } catch (error) {
     console.error("Error fetching vendors:", error);
+    return [];
+  }
+};
+
+export const fetchColors = async (): Promise<Color[]> => {
+  try {
+    // FIX: Removed 'as any' cast to allow for proper TypeScript type inference by the Directus SDK.
+    return await directus.request(readItems('colors', { fields: ['*'], limit: -1 })) as unknown as Color[];
+  } catch (error) {
+    console.error("Error fetching colors:", error);
     return [];
   }
 };
