@@ -1,9 +1,11 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { fetchStoreBySlug } from '../services/storeService';
-import { Store, Product } from '../types';
+import { fetchReelsByIds } from '../services/socialService';
+import { Store, Product, Reel } from '../types';
 import { 
   Info, 
   ShoppingBag, 
@@ -17,7 +19,8 @@ import {
   Send,
   Phone,
   MessageCircle,
-  MapPin
+  MapPin,
+  Play
 } from 'lucide-react';
 
 const StoreProfile: React.FC = () => {
@@ -26,6 +29,7 @@ const StoreProfile: React.FC = () => {
   
   const [store, setStore] = useState<Store | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
+  const [reels, setReels] = useState<Reel[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -40,6 +44,12 @@ const StoreProfile: React.FC = () => {
         if (fetchedStore) {
           setStore(fetchedStore);
           setProducts(fetchedProducts);
+
+          // Fetch Reels if available
+          if (fetchedStore.reelIds && fetchedStore.reelIds.length > 0) {
+            const fetchedReels = await fetchReelsByIds(fetchedStore.reelIds);
+            setReels(fetchedReels);
+          }
         } else {
           setError("فروشگاه مورد نظر یافت نشد.");
         }
@@ -77,9 +87,6 @@ const StoreProfile: React.FC = () => {
     { key: 'mobile', label: 'موبایل', value: store.mobile, icon: <Phone size={18} /> },
     { key: 'address', label: 'آدرس', value: store.address, icon: <MapPin size={18} /> },
   ].filter(item => item.value);
-
-  // Note: storePosts are not fetched yet, so we show an empty state.
-  const storePosts: any[] = [];
 
   return (
     <div className="store-page">
@@ -203,26 +210,43 @@ const StoreProfile: React.FC = () => {
             )}
           </section>
 
-          {/* Posts Section */}
+          {/* Posts/Reels Section */}
           <section>
             <div className="section-header">
               <h2 className="section-title">
                 <Grid size={22} className="text-gray-400" />
                 پست‌های اخیر
+                <span className="text-sm font-normal text-gray-500 mr-2">({reels.length})</span>
               </h2>
             </div>
             
-            {storePosts.length > 0 ? (
+            {reels.length > 0 ? (
               <div className="store-posts-grid">
-                {storePosts.map(post => (
-                  <div key={post.id} className="mini-post">
-                    <img src={post.image} alt="post" />
-                    <div className="mini-post-overlay">
-                      <Heart size={18} fill="currentColor" />
-                      <span>{post.likes}</span>
+                {reels.map(reel => {
+                  const isVideo = reel.mimeType?.startsWith('video/');
+                  return (
+                    <div key={reel.id} className="mini-post">
+                      {isVideo ? (
+                         <video 
+                           src={reel.media} 
+                           className="w-full h-full object-cover" 
+                           preload="metadata"
+                           muted
+                         />
+                      ) : (
+                        <img src={reel.media} alt="post" />
+                      )}
+                      
+                      <div className="mini-post-overlay">
+                        {isVideo && <Play size={24} className="mb-1" fill="white" />}
+                        <div className="flex items-center gap-1">
+                          <Heart size={16} fill="white" />
+                          <span>{reel.likes}</span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <div className="text-center text-gray-500 py-8">این فروشگاه هنوز پستی منتشر نکرده است.</div>

@@ -1,3 +1,4 @@
+
 import { readItems } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { Store, Product } from '../types';
@@ -11,6 +12,16 @@ import { fetchProducts } from './productService';
  * Accepts partial data from list views.
  */
 const mapStoreData = (item: Partial<DirectusStore>): Store => {
+  // Handle store_reels: can be number[] (O2M) or { reels_id: number }[] (M2M)
+  let reelIds: number[] = [];
+  if (Array.isArray(item.store_reels)) {
+    reelIds = item.store_reels.map((r: any) => {
+      if (typeof r === 'number') return r;
+      if (typeof r === 'object' && r !== null && r.reels_id) return r.reels_id;
+      return null;
+    }).filter((id): id is number => id !== null);
+  }
+
   return {
     id: String(item.id!),
     name: item.store_name!,
@@ -23,6 +34,7 @@ const mapStoreData = (item: Partial<DirectusStore>): Store => {
     isFollowing: false, // mock
     description: item.store_description || 'اطلاعات فروشگاه به زودی تکمیل می‌شود.',
     productIds: item.store_products || [],
+    reelIds: reelIds,
     
     channel: item.store_channel || undefined,
     instagram: item.store_instagram || undefined,
@@ -45,7 +57,7 @@ export const fetchStores = async (): Promise<Store[]> => {
   try {
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const result = await directus.request(readItems('stores', {
-      fields: ['id', 'store_name', 'store_slug', 'store_logo'],
+      fields: ['id', 'store_name', 'store_slug', 'store_logo', 'store_reels'],
       filter: { status: { _eq: 'published' } },
       limit: 10
     })) as unknown as DirectusStore[];
@@ -63,7 +75,7 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
   try {
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const storeResults = await directus.request(readItems('stores', {
-      fields: ['*'],
+      fields: ['*', 'store_reels'],
       filter: {
         store_slug: { _eq: slug },
         status: { _eq: 'published' }

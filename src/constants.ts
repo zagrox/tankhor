@@ -15,6 +15,7 @@ export const MOCK_STORES: Store[] = [
     description: 'ارائه دهنده بهترین لباس‌های شب و مجلسی با طراحی اختصاصی.',
     // FIX: Added missing productIds property to match the Store type.
     productIds: [2, 5],
+    reelIds: [],
   },
   {
     id: 's2',
@@ -29,6 +30,7 @@ export const MOCK_STORES: Store[] = [
     description: 'محصولات چرمی اصل با کیفیت صادراتی.',
     // FIX: Added missing productIds property to match the Store type.
     productIds: [1, 4],
+    reelIds: [],
   },
   {
     id: 's3',
@@ -43,6 +45,7 @@ export const MOCK_STORES: Store[] = [
     description: 'جدیدترین ترندهای مد خیابانی و کژوال.',
     // FIX: Added missing productIds property to match the Store type.
     productIds: [3, 6],
+    reelIds: [],
   },
 ];
 

@@ -69,6 +69,7 @@ export interface Store {
   isFollowing: boolean; // mocked
   description: string; // from store_description
   productIds: number[]; // from store_products
+  reelIds: number[]; // from store_reels
 
   // Contact & Social Info
   channel?: string; // telegram channel
