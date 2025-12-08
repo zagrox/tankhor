@@ -1,10 +1,9 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fetchProducts } from '../services/productService'; 
 import { Product } from '../types';
-import { MOCK_PRODUCTS } from '../constants'; // Keep mock products as a fallback
+import { MOCK_PRODUCTS, PRICE_RANGES } from '../constants'; // Keep mock products as a fallback
 import { Link } from 'react-router-dom';
 import { ShoppingBag } from 'lucide-react';
 
@@ -19,6 +18,7 @@ const Marketplace: React.FC = () => {
     selectedGenders, // Get genders filter
     selectedVendors, // Get vendors filter
     selectedColorFamilies, // Get color families filter
+    selectedPriceRanges, // Get price ranges filter
     priceSort,
   } = useAppContext();
 
@@ -74,7 +74,14 @@ const Marketplace: React.FC = () => {
     // Color Family Filter (Check against color_family property)
     const colorMatch = selectedColorFamilies.length === 0 || (p.colors && p.colors.some(c => c.color_family && selectedColorFamilies.includes(c.color_family)));
 
-    return categoryMatch && seasonMatch && styleMatch && materialMatch && genderMatch && vendorMatch && colorMatch;
+    // Price Range Filter
+    const priceMatch = selectedPriceRanges.length === 0 || selectedPriceRanges.some(rangeId => {
+      const range = PRICE_RANGES.find(r => r.id === rangeId);
+      if (!range) return false;
+      return p.finalPrice >= range.min && p.finalPrice < range.max;
+    });
+
+    return categoryMatch && seasonMatch && styleMatch && materialMatch && genderMatch && vendorMatch && colorMatch && priceMatch;
   }).sort((a, b) => {
     if (priceSort === 'asc') return a.finalPrice - b.finalPrice;
     if (priceSort === 'desc') return b.finalPrice - a.finalPrice;

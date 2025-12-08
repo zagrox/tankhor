@@ -1,11 +1,11 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Filter } from 'lucide-react';
 import MultiSelectDropdown from './MultiSelectDropdown';
 import { fetchSeasons, fetchStyles, fetchMaterials, fetchGenders, fetchColors, fetchVendors } from '../services/categoryService';
 import { Season, Style, Material, Gender, Color, Vendor } from '../types';
+import { PRICE_RANGES } from '../constants';
 
 const SecondarySidebar: React.FC = () => {
   const { 
@@ -23,6 +23,8 @@ const SecondarySidebar: React.FC = () => {
     setSelectedVendors,
     selectedColorFamilies,
     setSelectedColorFamilies,
+    selectedPriceRanges,
+    setSelectedPriceRanges,
     priceSort, 
     setPriceSort,
     groupedCategories,
@@ -125,6 +127,14 @@ const SecondarySidebar: React.FC = () => {
     }))
   }];
 
+  const priceGroups = [{
+    label: 'محدوده قیمت',
+    options: PRICE_RANGES.map(range => ({
+      value: range.id,
+      label: range.label
+    }))
+  }];
+
   return (
     <aside className="secondary-sidebar">
       <div className="secondary-sidebar-content">
@@ -139,6 +149,15 @@ const SecondarySidebar: React.FC = () => {
             groups={categoryGroups}
             selectedValues={selectedCategories}
             onChange={setSelectedCategories}
+          />
+        </div>
+
+        <div className="filter-group">
+           <MultiSelectDropdown 
+            label="محدوده قیمت"
+            groups={priceGroups}
+            selectedValues={selectedPriceRanges}
+            onChange={setSelectedPriceRanges}
           />
         </div>
 

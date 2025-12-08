@@ -1,5 +1,4 @@
 
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { fetchAppConfiguration } from '../services/configService';
 import { getAssetUrl } from '../services/client';
@@ -37,6 +36,9 @@ interface AppContextType {
   selectedColorFamilies: string[]; // Color Family Filter
   setSelectedColorFamilies: (colors: string[]) => void;
 
+  selectedPriceRanges: string[]; // Price Range Filter
+  setSelectedPriceRanges: (ranges: string[]) => void;
+
   priceSort: PriceSort;
   setPriceSort: (sort: PriceSort) => void;
   groupedCategories: Map<string, Category[]>;
@@ -57,6 +59,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [selectedGenders, setSelectedGenders] = useState<string[]>([]);
   const [selectedVendors, setSelectedVendors] = useState<string[]>([]);
   const [selectedColorFamilies, setSelectedColorFamilies] = useState<string[]>([]);
+  const [selectedPriceRanges, setSelectedPriceRanges] = useState<string[]>([]);
   const [priceSort, setPriceSort] = useState<PriceSort>('default');
   const [groupedCategories, setGroupedCategories] = useState<Map<string, Category[]>>(new Map());
 
@@ -117,6 +120,8 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     setSelectedVendors,
     selectedColorFamilies,
     setSelectedColorFamilies,
+    selectedPriceRanges,
+    setSelectedPriceRanges,
     priceSort,
     setPriceSort,
     groupedCategories,

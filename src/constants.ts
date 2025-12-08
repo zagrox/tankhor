@@ -1,3 +1,4 @@
+
 import { Product, Store, Post, BlogPost } from './types';
 
 export const MOCK_STORES: Store[] = [
@@ -181,4 +182,13 @@ export const MOCK_BLOGS: BlogPost[] = [
     image: 'https://picsum.photos/800/400?random=31',
     content: 'متن کامل مقاله اینجا قرار می‌گیرد...',
   },
+];
+
+export const PRICE_RANGES = [
+  { id: 'under_500k', label: 'زیر ۵۰۰ هزار تومان', min: 0, max: 500000 },
+  { id: '500k_1m', label: '۵۰۰ هزار تا ۱ میلیون تومان', min: 500000, max: 1000000 },
+  { id: '1m_2m', label: '۱ تا ۲ میلیون تومان', min: 1000000, max: 2000000 },
+  { id: '2m_5m', label: '۲ تا ۵ میلیون تومان', min: 2000000, max: 5000000 },
+  { id: '5m_10m', label: '۵ تا ۱۰ میلیون تومان', min: 5000000, max: 10000000 },
+  { id: 'above_10m', label: 'بالای ۱۰ میلیون تومان', min: 10000000, max: Infinity },
 ];
