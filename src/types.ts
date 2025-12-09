@@ -102,6 +102,7 @@ export interface Reel {
   mimeType?: string; // Type of the media file (e.g. video/mp4, image/jpeg)
   likes: number;
   date: string;
+  cover?: string; // Added cover image property
   store: {
     id: string;
     name: string;

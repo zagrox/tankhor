@@ -27,6 +27,7 @@ export interface DirectusReel {
   reel_file: string | DirectusFile; // UUID of the file or Expanded Object
   reel_store: number | DirectusStore; // ID or Expanded Object
   reel_like: number;
+  reel_cover: string | null; // Added reel_cover field
 }
 
 export interface DirectusProduct {

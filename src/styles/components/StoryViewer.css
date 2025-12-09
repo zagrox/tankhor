@@ -1,0 +1,309 @@
+
+/* Full Screen Overlay */
+.story-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: #000;
+  z-index: var(--z-modal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none; /* Prevent scrolling */
+}
+
+/* Media Container (Mobile Aspect Ratio) */
+.story-media-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  max-width: 480px; /* Limit width on desktop */
+  background-color: #1a1a1a;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .story-media-container {
+    border-radius: var(--radius-xl);
+    height: 95vh;
+  }
+}
+
+.story-media {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Progress Bars */
+.story-progress-container {
+  position: absolute;
+  top: 1rem;
+  left: 0.5rem;
+  right: 0.5rem;
+  z-index: 20;
+  display: flex;
+  gap: 0.25rem;
+  height: 2px;
+}
+
+.progress-segment {
+  flex: 1;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #fff;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+.progress-fill.completed {
+  width: 100%;
+}
+
+.progress-fill.active {
+  /* Width is handled via inline style or JS animation */
+}
+
+/* Header Info */
+.story-header {
+  position: absolute;
+  top: 2rem;
+  left: 0;
+  right: 0;
+  padding: 0 1rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  direction: rtl; /* Ensure RTL layout */
+  pointer-events: none; /* Let clicks pass through generally */
+}
+
+.story-header-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  pointer-events: auto; /* Re-enable clicks for the link */
+}
+
+.story-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.5);
+}
+
+.story-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.story-username {
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.story-time {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.75rem;
+}
+
+.story-close-btn {
+  color: white;
+  background: transparent;
+  padding: 0.5rem;
+  cursor: pointer;
+  opacity: 0.8;
+  pointer-events: auto; /* Re-enable clicks */
+  border: none;
+}
+
+/* Tap Zones */
+.tap-zone {
+  position: absolute;
+  top: 4rem; /* Below header */
+  bottom: 5rem; /* Above footer/input if added */
+  width: 30%;
+  z-index: 10;
+  /* background: rgba(255,0,0,0.1); Debugging */
+}
+
+.tap-zone.left {
+  left: 0;
+}
+
+.tap-zone.right {
+  right: 0;
+}
+
+/* Loader */
+.story-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111;
+  z-index: 5;
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Footer Actions */
+.story-footer-actions {
+  position: absolute;
+  bottom: 2rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 30; /* Above tap zones */
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* Right align icons in LTR, Left in RTL context */
+  gap: 1.25rem;
+  pointer-events: auto;
+  direction: ltr; /* To keep icons ordered naturally or control gap */
+}
+
+/* In RTL mode, flex-end pushes to left. We want them on one side or spread. 
+   Let's create a row of actions. */
+.story-action-btn {
+  background: transparent;
+  border: none;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+
+.story-action-btn:active {
+  transform: scale(0.9);
+}
+
+.story-mute-icon {
+  margin-right: auto; /* Pushes mute to the other side if needed */
+  background-color: rgba(0,0,0,0.5);
+  color: white;
+  padding: 0.5rem;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+/* Product Bottom Sheet */
+.story-product-sheet {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(24, 24, 27, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+  padding: 1.5rem;
+  z-index: 40;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  max-height: 60%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-product-sheet.open {
+  transform: translateY(0);
+}
+
+.sheet-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.sheet-title {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.sheet-close {
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  padding: 0.25rem;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.story-products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.story-product-card {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.75rem;
+  padding: 0.5rem;
+  text-decoration: none;
+  color: white;
+}
+
+.story-product-img {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 0.5rem;
+  object-fit: cover;
+  background-color: white;
+}
+
+.story-product-info {
+  flex: 1;
+}
+
+.story-product-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+.story-product-price {
+  font-size: 0.75rem;
+  color: #ccc;
+}
+
+.story-btn-shop {
+  background-color: white;
+  color: black;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+}

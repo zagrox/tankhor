@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../services/storeService';
@@ -7,12 +8,15 @@ import { fetchProducts } from '../services/productService';
 import { Store as StoreType, Reel, Product } from '../types';
 import { Heart, MessageCircle, Share2, ShoppingBag, Volume2, VolumeX, Play, Pause, ChevronLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import StoryViewer from '../components/StoryViewer';
 
 // --- Sub-Component: Feed Post (Handles Video Logic & UI) ---
 const FeedPost: React.FC<{ 
   reel: Reel; 
-  linkedProducts: Product[]; 
-}> = ({ reel, linkedProducts }) => {
+  linkedProducts: Product[];
+  hasActiveStory?: boolean;
+  onStoryClick?: () => void;
+}> = ({ reel, linkedProducts, hasActiveStory, onStoryClick }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
@@ -85,11 +89,11 @@ const FeedPost: React.FC<{
               ref={videoRef}
               src={reel.media}
               className="reel-video"
-              poster={reel.store.coverImage}
               loop
               muted={isMuted}
               playsInline
               preload="metadata"
+              poster={reel.cover} // Use the cover image as poster
             />
             {/* Play/Pause Animation Overlay */}
             <div className={`center-play-icon ${showOverlayIcon ? 'animate' : ''}`}>
@@ -137,9 +141,20 @@ const FeedPost: React.FC<{
         
         {/* User Info */}
         <div className="reel-user-row">
-          <Link to={`/stores/${reel.store.slug}`} className="reel-avatar-link">
-            <img src={reel.store.avatar} alt={reel.store.name} className="reel-avatar" />
-          </Link>
+          {hasActiveStory ? (
+             <div 
+               className="story-ring-active cursor-pointer" 
+               onClick={onStoryClick}
+               title="مشاهده استوری"
+             >
+                <img src={reel.store.avatar} alt={reel.store.name} className="reel-avatar" />
+             </div>
+          ) : (
+            <Link to={`/stores/${reel.store.slug}`} className="reel-avatar-link">
+              <img src={reel.store.avatar} alt={reel.store.name} className="reel-avatar" />
+            </Link>
+          )}
+          
           <div className="flex flex-col">
             <Link to={`/stores/${reel.store.slug}`} className="reel-username">
               {reel.store.name}
@@ -189,6 +204,11 @@ const SocialFeed: React.FC = () => {
   const [reels, setReels] = useState<Reel[]>([]);
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   
+  // Story Viewing State
+  const [storyStores, setStoryStores] = useState<StoreType[]>([]);
+  const [isViewingStory, setIsViewingStory] = useState(false);
+  const [viewingStoreIndex, setViewingStoreIndex] = useState(0);
+
   // Pagination State
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -202,8 +222,12 @@ const SocialFeed: React.FC = () => {
       try {
         const fetchedStores = await fetchStores();
         setStores(fetchedStores);
+        
+        // Filter stores that actually have reels for the Story bubbles
+        setStoryStores(fetchedStores.filter(s => s.reelIds && s.reelIds.length > 0));
 
-        const initialReels = await fetchReels(1, 5); // Load first 5
+        // Fix: Removed 3rd argument from fetchReels
+        const initialReels = await fetchReels(1, 5); 
         setReels(initialReels);
         
         if (initialReels.length < 5) setHasMore(false);
@@ -234,6 +258,7 @@ const SocialFeed: React.FC = () => {
     const nextPage = page + 1;
     
     try {
+      // Fix: Removed 3rd argument from fetchReels
       const newReels = await fetchReels(nextPage, 5);
       
       if (newReels.length === 0) {
@@ -284,31 +309,62 @@ const SocialFeed: React.FC = () => {
     return relatedProducts.filter(p => p.relatedReelIds && p.relatedReelIds.includes(reelId));
   };
 
+  const openStory = (index: number) => {
+    setViewingStoreIndex(index);
+    setIsViewingStory(true);
+  };
+  
+  // Helper to open story from FeedPost
+  const openStoryFromFeed = (storeId: string) => {
+    const index = storyStores.findIndex(s => s.id === storeId);
+    if (index !== -1) {
+      openStory(index);
+    }
+  };
+
   return (
     <div className="social-page">
-      {/* Stories */}
+      {/* Story Viewer Overlay */}
+      {isViewingStory && storyStores.length > 0 && (
+        <StoryViewer 
+          stores={storyStores} 
+          initialStoreIndex={viewingStoreIndex} 
+          onClose={() => setIsViewingStory(false)} 
+        />
+      )}
+
+      {/* Stories Bubbles */}
       <div className="stories-container">
         <div className="stories-scroll">
-          {stores.map((store) => (
-            <Link to={`/stores/${store.slug}`} key={store.id} className="story-card">
+          {storyStores.map((store, index) => (
+            <div 
+              key={store.id} 
+              className="story-card cursor-pointer" 
+              onClick={() => openStory(index)}
+            >
               <div className="story-ring">
                 <img src={store.avatar} alt={store.name} className="story-img" />
               </div>
               <span className="story-username">{store.name}</span>
-            </Link>
+            </div>
           ))}
         </div>
       </div>
 
       {/* Feed */}
       <div className="feed-list">
-        {reels.map((reel) => (
-          <FeedPost 
-            key={reel.id} 
-            reel={reel} 
-            linkedProducts={getProductsForReel(reel.id)} 
-          />
-        ))}
+        {reels.map((reel) => {
+          const hasStory = storyStores.some(s => s.id === reel.store.id);
+          return (
+            <FeedPost 
+              key={reel.id} 
+              reel={reel} 
+              linkedProducts={getProductsForReel(reel.id)}
+              hasActiveStory={hasStory}
+              onStoryClick={() => openStoryFromFeed(reel.store.id)}
+            />
+          );
+        })}
         
         {/* Loader Sentinel */}
         <div ref={observerTarget} className="feed-loader">

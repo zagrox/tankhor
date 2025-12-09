@@ -247,6 +247,19 @@
   border-radius: 50%;
   border: 2px solid white;
   object-fit: cover;
+  display: block;
+}
+
+/* Active Story Ring */
+.story-ring-active {
+  padding: 2px;
+  border-radius: 50%;
+  background: linear-gradient(to top right, #fbbf24, #f97316, #9333ea);
+  display: inline-block;
+}
+
+.story-ring-active .reel-avatar {
+  border: 1px solid black; /* Contrast separation */
 }
 
 .reel-username {

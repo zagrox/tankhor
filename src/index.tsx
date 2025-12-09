@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -14,7 +13,8 @@ import './styles/components/Layout.css';
 import './styles/components/Sidebar.css';
 import './styles/components/Loader.css';
 import './styles/components/SecondarySidebar.css';
-import './styles/components/MultiSelectDropdown.css'; // Import new dropdown styles
+import './styles/components/MultiSelectDropdown.css'; 
+import './styles/components/StoryViewer.css'; // New Import
 
 /* Page Styles */
 import './styles/pages/Home.css';

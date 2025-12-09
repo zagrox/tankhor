@@ -1,4 +1,5 @@
 
+
 import { readItems } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { Reel } from '../types';
@@ -9,6 +10,7 @@ export const fetchReels = async (page = 1, limit = 5): Promise<Reel[]> => {
       fields: [
         'id',
         'reel_caption',
+        'reel_cover', // Fetch cover image
         // Expand reel_file to get metadata like type
         { reel_file: ['id', 'type'] },
         'reel_like',
@@ -37,6 +39,7 @@ export const fetchReelsByIds = async (ids: number[]): Promise<Reel[]> => {
       fields: [
         'id',
         'reel_caption',
+        'reel_cover', // Fetch cover image
         { reel_file: ['id', 'type'] },
         'reel_like',
         'date_created',
@@ -65,6 +68,7 @@ const mapReelData = (item: any): Reel => {
     id: item.id,
     caption: item.reel_caption?.replace(/<[^>]*>/g, '') || '', 
     media: getAssetUrl(fileId),
+    cover: item.reel_cover ? getAssetUrl(item.reel_cover) : undefined, // Map cover image
     mimeType: fileType,
     likes: item.reel_like || 0,
     date: item.date_created,
