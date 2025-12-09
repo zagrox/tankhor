@@ -244,7 +244,7 @@ const ProductDetail: React.FC = () => {
                 <Link to={`/stores/${product.storeSlug}`} className="seller-name">{product.storeName || 'فروشگاه'}</Link>
               </div>
               <Link to={`/stores/${product.storeSlug}`} className="seller-link-btn">
-                مشاهده غرفه
+                مشاهده فروشگاه
               </Link>
             </div>
           )}

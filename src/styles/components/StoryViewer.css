@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   touch-action: none; /* Prevent scrolling */
+  backdrop-filter: blur(10px);
 }
 
 /* Media Container (Mobile Aspect Ratio) */
@@ -16,15 +17,20 @@
   width: 100%;
   height: 100%;
   position: relative;
-  max-width: 480px; /* Limit width on desktop */
   background-color: #1a1a1a;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 768px) {
   .story-media-container {
     border-radius: var(--radius-xl);
-    height: 95vh;
+    height: 95vh; /* Maximize height on desktop */
+    width: auto; /* Let width be determined by aspect ratio */
+    aspect-ratio: 9 / 16; /* Enforce Reel aspect ratio */
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); /* Add depth */
+    max-width: 100vw; /* Safety cap */
   }
 }
 
