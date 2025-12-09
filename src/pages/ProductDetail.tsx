@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -101,10 +100,10 @@ const ProductDetail: React.FC = () => {
         <span>{product.name}</span>
       </nav>
 
-      {/* Main 50/50 Grid */}
+      {/* --- ROW 1: Main Product Info (Image & Buy Box) --- */}
       <div className="product-layout-grid">
         
-        {/* --- RIGHT COLUMN: Image Gallery --- */}
+        {/* RIGHT COLUMN: Image Gallery */}
         <div className="product-gallery-section">
           <div className="main-image-wrapper">
             <img 
@@ -124,7 +123,7 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* --- LEFT COLUMN: Product Info & Attributes --- */}
+        {/* LEFT COLUMN: Product Info & Attributes */}
         <div className="product-info-section">
           
           {/* Header */}
@@ -170,7 +169,9 @@ const ProductDetail: React.FC = () => {
           {/* Variants: Colors */}
           {product.colors && product.colors.length > 0 && (
             <div className="variant-group">
-              <span className="variant-label">رنگ: <span className="selected-value">{selectedColor?.color_title || selectedColor?.color_name || selectedColor?.id}</span></span>
+               <span className="variant-label">
+                رنگ: <span className="selected-value">{selectedColor?.color_title || selectedColor?.color_name || selectedColor?.id || '-'}</span>
+              </span>
               <div className="colors-grid">
                 {product.colors.map((color) => (
                   <button
@@ -190,7 +191,9 @@ const ProductDetail: React.FC = () => {
           {/* Variants: Sizes */}
           {product.sizes && product.sizes.length > 0 && (
             <div className="variant-group">
-              <span className="variant-label">سایز: <span className="selected-value">{selectedSize?.size_title || selectedSize?.size_name || selectedSize?.id}</span></span>
+               <span className="variant-label">
+                سایز: <span className="selected-value">{selectedSize?.size_title || selectedSize?.size_name || selectedSize?.id || '-'}</span>
+              </span>
               <div className="sizes-grid">
                 {product.sizes.map(size => (
                   <button
@@ -261,20 +264,11 @@ const ProductDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* --- Content Tabs / Details Section --- */}
-      <div className="product-content-tabs">
+      {/* --- ROW 2: Specifications & Reels (Split View) --- */}
+      <div className="details-split-grid">
         
-        {/* Description */}
-        <section className="detail-section">
-           <h2 className="section-heading">توضیحات محصول</h2>
-           <div 
-             className="description-text"
-             dangerouslySetInnerHTML={{ __html: product.description || "توضیحاتی برای این محصول ثبت نشده است." }}
-           />
-        </section>
-
-        {/* Specifications Table */}
-        <section className="detail-section">
+        {/* Column 1: Specifications (Table) */}
+        <section className="detail-section specs-col">
           <h2 className="section-heading">مشخصات فنی</h2>
           <div className="specs-container">
             <table className="specs-table">
@@ -320,20 +314,20 @@ const ProductDetail: React.FC = () => {
           </div>
         </section>
 
-        {/* Related Reels */}
+        {/* Column 2: Reels (Grid) - Only if exists */}
         {reels.length > 0 && (
-          <section className="detail-section">
-             <h2 className="section-heading">ویدیوهای مرتبط</h2>
-             <div className="reels-scroller">
+          <section className="detail-section reels-col">
+             <h2 className="section-heading">ویدیوهای محصول</h2>
+             <div className="reels-grid-compact">
                {reels.map(reel => (
-                 <div key={reel.id} className="reel-card">
+                 <div key={reel.id} className="reel-card compact">
                    {reel.mimeType?.startsWith('video/') ? (
                       <video src={reel.media} className="object-cover w-full h-full" muted />
                    ) : (
                       <img src={reel.media} alt={reel.caption} />
                    )}
                    <div className="play-overlay">
-                      <Play size={24} fill="white" />
+                      <Play size={20} fill="white" />
                    </div>
                  </div>
                ))}
@@ -342,6 +336,16 @@ const ProductDetail: React.FC = () => {
         )}
 
       </div>
+
+      {/* --- ROW 3: Description (Full Width) --- */}
+      <section className="detail-section description-full">
+          <h2 className="section-heading">توضیحات محصول</h2>
+          <div 
+            className="description-text"
+            dangerouslySetInnerHTML={{ __html: product.description || "توضیحاتی برای این محصول ثبت نشده است." }}
+          />
+      </section>
+
     </div>
   );
 };
