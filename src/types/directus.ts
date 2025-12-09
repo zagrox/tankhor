@@ -2,7 +2,6 @@
 import {
   AppConfiguration,
   Post,
-  BlogPost,
   Season,
   Style,
   Material,
@@ -90,14 +89,25 @@ export interface DirectusStore {
   store_color?: string | null;
 }
 
+export interface DirectusBlog {
+  id: number;
+  status: string;
+  date_created: string;
+  blog_title: string;
+  blog_summary: string;
+  blog_content: string;
+  blog_slug: string;
+  blog_image: string;
+}
+
 export interface DirectusSchema {
   configuration: AppConfiguration;
   products: DirectusProduct[];
   stores: DirectusStore[];
   posts: Post[];
-  blog_posts: BlogPost[];
   
-  // New Collection
+  // New Collections
+  blogs: DirectusBlog[];
   reels: DirectusReel[];
 
   // Filter Collections

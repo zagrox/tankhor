@@ -1,4 +1,5 @@
 
+
 import { Product, Store, Post, BlogPost } from './types';
 
 export const MOCK_STORES: Store[] = [
@@ -176,6 +177,7 @@ export const MOCK_BLOGS: BlogPost[] = [
     date: '۱۴۰۳/۰۲/۱۵',
     image: 'https://picsum.photos/800/400?random=30',
     content: 'متن کامل مقاله اینجا قرار می‌گیرد...',
+    slug: 'color-trends-1403',
   },
   {
     id: 'b2',
@@ -184,6 +186,7 @@ export const MOCK_BLOGS: BlogPost[] = [
     date: '۱۴۰۳/۰۱/۲۰',
     image: 'https://picsum.photos/800/400?random=31',
     content: 'متن کامل مقاله اینجا قرار می‌گیرد...',
+    slug: 'buying-genuine-leather',
   },
 ];
 

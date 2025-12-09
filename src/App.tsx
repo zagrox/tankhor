@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 // FIX: Switched from react-router-dom v5 to v6/v7 syntax to resolve module export errors.
 // This involves replacing `Switch` with `Routes`, `Redirect` with `Navigate`,
@@ -12,6 +11,7 @@ import SocialFeed from './pages/SocialFeed';
 import Marketplace from './pages/Marketplace';
 import ProductDetail from './pages/ProductDetail';
 import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
 import StoreProfile from './pages/StoreProfile';
 import Cart from './pages/Cart';
 import FiltersPage from './pages/FiltersPage';
@@ -47,7 +47,9 @@ const App: React.FC = () => {
             <Route path="/product/:id" element={<ProductDetail />} />
             {/* Changed store route to use slug for SEO */}
             <Route path="/stores/:slug" element={<StoreProfile />} />
+            
             <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
             
             <Route path="/cart" element={<Cart />} />
             

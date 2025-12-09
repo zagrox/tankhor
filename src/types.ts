@@ -127,7 +127,8 @@ export interface BlogPost {
   excerpt: string;
   date: string;
   image: string;
-  content: string;
+  content: string; // Full content
+  slug: string; // Added slug
 }
 
 export interface AppConfiguration {
