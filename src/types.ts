@@ -43,6 +43,7 @@ export interface Product {
   storeName?: string;
   storeSlug?: string;
   storeAvatar?: string;
+  storeColor?: string; // Added storeColor for branding
   storeVendor?: Vendor; // Added Vendor info for filtering
   
   // M2M Relational Attributes
@@ -66,7 +67,8 @@ export interface Store {
   slug: string; // from store_slug
   title?: string; // from store_title
   avatar: string; // from store_logo
-  coverImage: string; // generated placeholder
+  coverImage?: string; // generated placeholder or from store_cover
+  coverColor?: string; // from store_color
   followers: number; // mocked
   isFollowing: boolean; // mocked
   description: string; // from store_description

@@ -1,4 +1,5 @@
 
+
 import { readItems } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { Store, Product } from '../types';
@@ -29,7 +30,8 @@ const mapStoreData = (item: Partial<DirectusStore>): Store => {
     handle: `@${item.store_slug!}`,
     slug: item.store_slug!,
     avatar: getAssetUrl(item.store_logo!),
-    coverImage: 'https://picsum.photos/800/300?random=' + item.id,
+    coverImage: item.store_cover ? getAssetUrl(item.store_cover) : undefined,
+    coverColor: item.store_color || undefined,
     followers: 12500, // mock
     isFollowing: false, // mock
     description: item.store_description || 'اطلاعات فروشگاه به زودی تکمیل می‌شود.',
@@ -57,7 +59,7 @@ export const fetchStores = async (): Promise<Store[]> => {
   try {
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const result = await directus.request(readItems('stores', {
-      fields: ['id', 'store_name', 'store_slug', 'store_logo', 'store_reels'],
+      fields: ['id', 'store_name', 'store_slug', 'store_logo', 'store_reels', 'store_cover', 'store_color'],
       filter: { status: { _eq: 'published' } },
       limit: 10
     })) as unknown as DirectusStore[];
@@ -90,10 +92,12 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
 
     const mappedStore = mapStoreData(storeResult);
 
+    // Optimized: Do not fetch reels relation products here. 
+    // We only fetch the main products relation.
     let products: Product[] = [];
     if (mappedStore.productIds && mappedStore.productIds.length > 0) {
       products = await fetchProducts({
-        id: { _in: mappedStore.productIds }
+        id: { _in: mappedStore.productIds },
       });
     }
 

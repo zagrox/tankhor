@@ -1,3 +1,5 @@
+
+
 .store-page {
   padding-bottom: 5rem;
 }
@@ -8,7 +10,7 @@
 }
 
 .cover-container {
-  height: 16rem;
+  height: 10rem;
   width: 100%;
   position: relative;
   overflow: hidden;
@@ -17,7 +19,7 @@
 
 @media (min-width: 768px) {
   .cover-container {
-    height: 20rem;
+    height: 14rem;
   }
 }
 
@@ -112,13 +114,6 @@
   margin: 0 0 0.25rem 0;
 }
 
-/* 
-  FIX: The desktop-specific styles that forced the text to white have been removed.
-  The text now correctly inherits its color from the theme variables (--text-main and --text-muted),
-  ensuring it's readable in both light and dark modes, as the layout no longer places
-  this text over the cover image.
-*/
-
 .profile-handle {
   font-size: 0.875rem;
   font-weight: 500;
@@ -130,7 +125,8 @@
 }
 
 .btn-follow-lg {
-  background-color: var(--color-secondary);
+  /* Use the store brand variable with fallback */
+  background-color: var(--store-theme, var(--color-secondary));
   color: white;
   padding: 0.75rem 2rem;
   border-radius: var(--radius-xl);
@@ -142,7 +138,7 @@
 }
 
 .btn-follow-lg:hover {
-  background-color: #a16207; /* Darker Gold */
+  opacity: 0.9;
 }
 
 /* Content */
@@ -178,6 +174,10 @@
   padding: 1.5rem;
   border-radius: var(--radius-2xl);
   border: 1px solid var(--border-light);
+}
+
+.text-store-theme {
+    color: var(--store-theme, var(--color-secondary));
 }
 
 .info-title {
@@ -299,7 +299,7 @@
 .mini-product-price {
   display: block;
   font-size: 0.75rem;
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   margin-top: 0.25rem;
 }
 
@@ -396,7 +396,7 @@
 }
 
 .contact-value.link {
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   text-decoration: none;
   font-weight: 700;
 }

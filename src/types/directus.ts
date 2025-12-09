@@ -84,6 +84,10 @@ export interface DirectusStore {
   store_telegram?: string;
   
   store_vendor?: Vendor | null; // Relation to Vendors
+
+  // New Fields
+  store_cover?: string | null;
+  store_color?: string | null;
 }
 
 export interface DirectusSchema {

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -89,8 +90,13 @@ const ProductDetail: React.FC = () => {
   // Derived Data
   const hasPrice = product.price > 0;
 
+  // Dynamic Page Style based on Store Color
+  const pageStyle = {
+    '--store-theme': product.storeColor || 'var(--color-secondary)'
+  } as React.CSSProperties;
+
   return (
-    <div className="product-detail-container">
+    <div className="product-detail-container" style={pageStyle}>
       
       {/* --- Breadcrumbs --- */}
       <nav className="breadcrumbs">
@@ -267,7 +273,28 @@ const ProductDetail: React.FC = () => {
       {/* --- ROW 2: Specifications & Reels (Split View) --- */}
       <div className="details-split-grid">
         
-        {/* Column 1: Specifications (Table) */}
+        {/* Column 1: Reels (Grid) - NOW FIRST (RIGHT in RTL) */}
+        {reels.length > 0 && (
+          <section className="detail-section reels-col">
+             <h2 className="section-heading">ویدیوهای محصول</h2>
+             <div className="reels-grid-compact">
+               {reels.map(reel => (
+                 <div key={reel.id} className="reel-card compact">
+                   {reel.mimeType?.startsWith('video/') ? (
+                      <video src={reel.media} className="object-cover w-full h-full" muted />
+                   ) : (
+                      <img src={reel.media} alt={reel.caption} />
+                   )}
+                   <div className="play-overlay">
+                      <Play size={20} fill="white" />
+                   </div>
+                 </div>
+               ))}
+             </div>
+          </section>
+        )}
+
+        {/* Column 2: Specifications (Table) - NOW SECOND (LEFT in RTL) */}
         <section className="detail-section specs-col">
           <h2 className="section-heading">مشخصات فنی</h2>
           <div className="specs-container">
@@ -313,27 +340,6 @@ const ProductDetail: React.FC = () => {
             </table>
           </div>
         </section>
-
-        {/* Column 2: Reels (Grid) - Only if exists */}
-        {reels.length > 0 && (
-          <section className="detail-section reels-col">
-             <h2 className="section-heading">ویدیوهای محصول</h2>
-             <div className="reels-grid-compact">
-               {reels.map(reel => (
-                 <div key={reel.id} className="reel-card compact">
-                   {reel.mimeType?.startsWith('video/') ? (
-                      <video src={reel.media} className="object-cover w-full h-full" muted />
-                   ) : (
-                      <img src={reel.media} alt={reel.caption} />
-                   )}
-                   <div className="play-overlay">
-                      <Play size={20} fill="white" />
-                   </div>
-                 </div>
-               ))}
-             </div>
-          </section>
-        )}
 
       </div>
 

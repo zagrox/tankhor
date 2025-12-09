@@ -49,7 +49,8 @@
 }
 
 .breadcrumbs a:hover {
-  color: var(--color-secondary);
+  /* Use store theme color for hover state */
+  color: var(--store-theme, var(--color-secondary));
 }
 
 /* Layout Grid - 50/50 Split */
@@ -136,7 +137,7 @@
 .category-tag {
   display: inline-block;
   font-size: 0.875rem;
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
@@ -212,7 +213,7 @@
   gap: 0.5rem;
   font-size: 1.25rem;
   font-weight: 700;
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   background-color: var(--bg-surface);
   padding: 1rem;
   border-radius: var(--radius-xl);
@@ -239,7 +240,7 @@
 
 .selected-value {
   font-weight: 400;
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   margin-right: 0.25rem;
 }
 
@@ -266,8 +267,8 @@
 }
 
 .color-swatch.selected {
-  border-color: var(--color-secondary);
-  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--color-secondary);
+  border-color: var(--store-theme, var(--color-secondary));
+  box-shadow: 0 0 0 2px var(--bg-card), 0 0 0 4px var(--store-theme, var(--color-secondary));
 }
 
 .sizes-grid {
@@ -294,8 +295,8 @@
 }
 
 .size-btn.selected {
-  border-color: var(--color-secondary);
-  background-color: var(--color-secondary);
+  border-color: var(--store-theme, var(--color-secondary));
+  background-color: var(--store-theme, var(--color-secondary));
   color: white;
 }
 
@@ -358,7 +359,7 @@
 
 .btn-add-cart {
   flex-grow: 1;
-  background-color: var(--color-secondary);
+  background-color: var(--store-theme, var(--color-secondary));
   color: white;
   height: 3.5rem;
   border-radius: var(--radius-xl);
@@ -438,7 +439,7 @@
 
 .seller-link-btn {
   font-size: 0.875rem;
-  color: var(--color-secondary);
+  color: var(--store-theme, var(--color-secondary));
   font-weight: 600;
 }
 

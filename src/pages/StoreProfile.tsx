@@ -39,24 +39,27 @@ const StoreProfile: React.FC = () => {
       setIsLoading(true);
       setError(null);
       try {
+        // Step 1: Fetch Store & Products (Fast)
         const { store: fetchedStore, products: fetchedProducts } = await fetchStoreBySlug(slug);
         
         if (fetchedStore) {
           setStore(fetchedStore);
           setProducts(fetchedProducts);
+          setIsLoading(false); // Stop loader to show UI quickly
 
-          // Fetch Reels if available
+          // Step 2: Fetch Reels in background (Waterfall)
           if (fetchedStore.reelIds && fetchedStore.reelIds.length > 0) {
-            const fetchedReels = await fetchReelsByIds(fetchedStore.reelIds);
-            setReels(fetchedReels);
+            fetchReelsByIds(fetchedStore.reelIds)
+              .then(fetchedReels => setReels(fetchedReels))
+              .catch(err => console.error("Background fetch of reels failed", err));
           }
         } else {
           setError("فروشگاه مورد نظر یافت نشد.");
+          setIsLoading(false);
         }
       } catch (err) {
         console.error("Failed to load store data:", err);
         setError("خطا در دریافت اطلاعات فروشگاه.");
-      } finally {
         setIsLoading(false);
       }
     };
@@ -64,7 +67,7 @@ const StoreProfile: React.FC = () => {
     loadData();
   }, [slug, setIsLoading]);
 
-  if (isLoading) {
+  if (isLoading && !store) {
     return null; // Global loader is active
   }
 
@@ -88,13 +91,25 @@ const StoreProfile: React.FC = () => {
     { key: 'address', label: 'آدرس', value: store.address, icon: <MapPin size={18} /> },
   ].filter(item => item.value);
 
+  // Define dynamic style for the store page
+  const pageStyle = {
+    '--store-theme': store.coverColor || 'var(--color-secondary)'
+  } as React.CSSProperties;
+
   return (
-    <div className="store-page">
+    <div className="store-page" style={pageStyle}>
       {/* Hero Section */}
       <div className="store-header">
-        <div className="cover-container">
-          <img src={store.coverImage} alt="Cover" className="cover-image" />
-          <div className="cover-overlay"></div>
+        <div 
+          className="cover-container" 
+          style={{ backgroundColor: store.coverColor || '#f1f5f9' }}
+        >
+          {store.coverImage && (
+            <>
+              <img src={store.coverImage} alt="Cover" className="cover-image" />
+              <div className="cover-overlay"></div>
+            </>
+          )}
         </div>
 
         <div className="profile-bar-container">
@@ -112,7 +127,10 @@ const StoreProfile: React.FC = () => {
             </div>
 
             <div className="action-buttons">
-              <button className="btn-follow-lg">
+              <button 
+                className="btn-follow-lg"
+                // Inline style backup removed in favor of CSS variable class
+              >
                 دنبال کردن
               </button>
             </div>
@@ -128,7 +146,7 @@ const StoreProfile: React.FC = () => {
           
           <div className="info-card">
             <h3 className="info-title">
-              <Info size={20} className="text-secondary" />
+              <Info size={20} className="text-store-theme" />
               {store.title || 'درباره ما'}
             </h3>
             <p className="info-text">{store.description}</p>
@@ -152,7 +170,7 @@ const StoreProfile: React.FC = () => {
           {contactInfo.length > 0 && (
             <div className="info-card">
               <h3 className="info-title">
-                <Contact size={20} className="text-secondary" />
+                <Contact size={20} className="text-store-theme" />
                 اطلاعات تماس و شبکه‌ها
               </h3>
               <ul className="contact-list">
@@ -232,6 +250,7 @@ const StoreProfile: React.FC = () => {
                            className="w-full h-full object-cover" 
                            preload="metadata"
                            muted
+                           poster={reel.cover}
                          />
                       ) : (
                         <img src={reel.media} alt="post" />
