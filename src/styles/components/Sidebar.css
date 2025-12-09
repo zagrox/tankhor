@@ -1,5 +1,6 @@
 
 
+
 /* --- Desktop Sidebar --- */
 .sidebar {
   /* Default: Hidden on mobile */
@@ -54,10 +55,12 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
+  gap: 0.75rem; /* Space between logo and text */
 }
 
 .sidebar.collapsed .sidebar-logo {
   justify-content: center;
+  gap: 0;
 }
 
 /* New Image Logo Styles */
@@ -78,11 +81,12 @@
   color: var(--color-secondary);
   font-size: 3rem;
   line-height: 0;
-  margin-right: 0.25rem;
+  /* margin-right removed in favor of gap on parent */
 }
 
 .logo-text {
   transition: opacity 0.2s ease, width 0.2s ease;
+  font-size: 1.5rem; /* Ensure readable title size */
 }
 
 .sidebar.collapsed .logo-text {
@@ -96,12 +100,18 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  border-radius: var(--radius-xl);
   transition: background-color 0.2s, color 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end; /* Align arrow to the inner edge */
+  width: 100%;
+}
+
+.sidebar.collapsed .collapse-btn {
+  justify-content: center; /* Center when collapsed */
+  padding: 0.75rem 0;
 }
 
 .collapse-btn:hover {
@@ -176,6 +186,9 @@
   margin-top: auto;
   padding-top: 1.5rem;
   border-top: 1px solid var(--border-light);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .theme-toggle-btn {

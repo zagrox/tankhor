@@ -133,6 +133,7 @@ export interface BlogPost {
 export interface AppConfiguration {
   id?: string; // FIX: Make id optional as singletons don't have it
   app_logo?: string; // Added field for the global loader logo
+  app_title?: string; // Added field for the app title
   [key: string]: any;
 }
 

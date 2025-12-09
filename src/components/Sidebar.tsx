@@ -11,8 +11,8 @@ import {
   Moon,
   Settings,
   ShoppingCart,
-  PanelRight,
-  PanelLeft,
+  ChevronRight,
+  ChevronLeft,
   LayoutGrid,
   Users
 } from 'lucide-react';
@@ -20,7 +20,7 @@ import { useAppContext } from '../context/AppContext';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const { appLogo } = useAppContext(); // Get the app logo from context
+  const { appLogo, appConfig } = useAppContext(); // Get the app logo and config from context
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true); // Default to collapsed
 
@@ -69,21 +69,12 @@ const Sidebar: React.FC = () => {
         <div className="sidebar-header">
           <Link to="/" className="sidebar-logo">
             {appLogo ? (
-              <img src={appLogo} alt="Tankhor Logo" className="sidebar-logo-img" />
+              <img src={appLogo} alt={appConfig?.app_title || "Tankhor Logo"} className="sidebar-logo-img" />
             ) : (
-              <>
-                <span className="logo-dot">.</span>
-                <span className="logo-text">تن‌خور</span>
-              </>
+              <span className="logo-dot">.</span>
             )}
+            <span className="logo-text">{appConfig?.app_title || 'تن‌خور'}</span>
           </Link>
-          <button 
-            onClick={() => setIsCollapsed(!isCollapsed)} 
-            className="collapse-btn"
-            aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-          >
-            {isCollapsed ? <PanelRight size={20} /> : <PanelLeft size={20} />}
-          </button>
         </div>
 
         <nav className="sidebar-nav">
@@ -119,6 +110,14 @@ const Sidebar: React.FC = () => {
         </nav>
 
         <div className="sidebar-footer">
+          <button 
+            onClick={() => setIsCollapsed(!isCollapsed)} 
+            className="collapse-btn"
+            aria-label={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+          >
+            {isCollapsed ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+          </button>
+          
           <button 
             onClick={toggleTheme} 
             className="theme-toggle-btn"
