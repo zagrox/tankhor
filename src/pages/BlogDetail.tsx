@@ -36,6 +36,73 @@ const BlogDetail: React.FC = () => {
     loadPost();
   }, [slug, setIsLoading]);
 
+  /**
+   * Parses "dirty" Markdown/Text from n8n and converts it to semantic HTML.
+   * Handles: **Bold**, ### Headers, 1. Ordered Lists, - Unordered Lists.
+   */
+  const formatContent = (content: string) => {
+    if (!content) return '';
+
+    // 1. Handle Bold (**text**) globally first
+    let formatted = content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // 2. Split into lines to handle block elements
+    const lines = formatted.split('\n');
+    let html = '';
+    let inOrderedList = false;
+    let inUnorderedList = false;
+
+    const closeLists = () => {
+      if (inOrderedList) { html += '</ol>'; inOrderedList = false; }
+      if (inUnorderedList) { html += '</ul>'; inUnorderedList = false; }
+    };
+
+    lines.forEach(line => {
+      const trimmed = line.trim();
+      
+      if (!trimmed) {
+        closeLists();
+        return; 
+      }
+
+      // Headers (### or ##)
+      if (trimmed.startsWith('###') || trimmed.startsWith('##')) {
+        closeLists();
+        const level = trimmed.startsWith('###') ? 3 : 2;
+        const text = trimmed.replace(/^#+\s*/, ''); // Remove hashtags
+        html += `<h${level}>${text}</h${level}>`;
+      }
+      // Ordered List (1. item)
+      else if (/^\d+\./.test(trimmed)) {
+        if (!inOrderedList) {
+          closeLists(); // Close ul if open
+          html += '<ol>';
+          inOrderedList = true;
+        }
+        const text = trimmed.replace(/^\d+\.\s*/, '');
+        html += `<li>${text}</li>`;
+      }
+      // Unordered List (* item or - item)
+      else if (trimmed.startsWith('* ') || trimmed.startsWith('- ')) {
+        if (!inUnorderedList) {
+          closeLists(); // Close ol if open
+          html += '<ul>';
+          inUnorderedList = true;
+        }
+        const text = trimmed.replace(/^[\*\-]\s*/, '');
+        html += `<li>${text}</li>`;
+      }
+      // Regular Paragraph
+      else {
+        closeLists();
+        html += `<p>${trimmed}</p>`;
+      }
+    });
+
+    closeLists(); // Close any remaining lists
+    return html;
+  };
+
   if (isLoading) return null;
 
   if (error || !post) {
@@ -79,7 +146,7 @@ const BlogDetail: React.FC = () => {
         <div className="post-content-wrapper">
           <div 
             className="post-content"
-            dangerouslySetInnerHTML={{ __html: post.content.replace(/\n/g, '<br/>') }}
+            dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
           />
         </div>
       </div>

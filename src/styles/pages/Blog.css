@@ -232,6 +232,11 @@
   color: var(--text-main);
 }
 
+/* Parsed Content Styles */
+.post-content {
+  color: var(--text-main);
+}
+
 .post-content p {
   margin-bottom: 1.5rem;
 }
@@ -242,6 +247,9 @@
   margin-top: 3rem;
   margin-bottom: 1.5rem;
   color: var(--text-main);
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--color-secondary);
+  display: inline-block;
 }
 
 .post-content h3 {
@@ -249,5 +257,30 @@
   font-weight: 700;
   margin-top: 2.5rem;
   margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.post-content strong {
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+/* Lists */
+.post-content ul,
+.post-content ol {
+  margin-bottom: 1.5rem;
+  padding-right: 1.5rem; /* Right padding for RTL bullets */
+  list-style-position: inside;
+}
+
+.post-content ul li {
+  list-style-type: disc;
+  margin-bottom: 0.5rem;
+  color: var(--text-main);
+}
+
+.post-content ol li {
+  list-style-type: decimal;
+  margin-bottom: 0.5rem;
   color: var(--text-main);
 }
