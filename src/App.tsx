@@ -1,6 +1,9 @@
 
-import React, { useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import React from 'react';
+// FIX: Switched from react-router-dom v5 to v6/v7 syntax to resolve module export errors.
+// This involves replacing `Switch` with `Routes`, `Redirect` with `Navigate`,
+// and using the `element` prop on `<Route>` instead of `component` or `render`.
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider } from './context/AppContext';
 import Layout from './components/Layout';
 import Loader from './components/Loader';
@@ -15,15 +18,6 @@ import FiltersPage from './pages/FiltersPage';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
 
-// Helper to scroll to top on route change
-const ScrollToTop = () => {
-  const { pathname } = useLocation();
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [pathname]);
-  return null;
-};
-
 // Simple placeholder components for unused routes
 const Placeholder = ({ title }: { title: string }) => (
   <div className="flex items-center justify-center h-[50vh]">
@@ -34,7 +28,6 @@ const Placeholder = ({ title }: { title: string }) => (
 const App: React.FC = () => {
   return (
     <Router>
-      <ScrollToTop />
       <AppProvider>
         <Loader />
         <Layout>
