@@ -1,5 +1,4 @@
 
-
 import { readItems, readItem } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { Product, Color, Size, Vendor } from '../types';
@@ -38,10 +37,20 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
 
   const relatedReelIds = extractM2M(item.product_reels, 'reels_id').map((r: any) => r.id);
 
+  // FIX: Logic for Colors/Sizes: Use extraData ONLY if it has items.
+  // Otherwise try to extract from the item itself (if expanded).
+  const colors = (extraData?.colors && extraData.colors.length > 0) 
+    ? extraData.colors 
+    : extractM2M(item.product_colors, 'colors_id');
+
+  const sizes = (extraData?.sizes && extraData.sizes.length > 0)
+    ? extraData.sizes
+    : extractM2M(item.product_sizes, 'sizes_id');
+
   return {
     id: String(item.id!),
     name: item.product_name!,
-    description: item.product__description || null,
+    description: item.product_description || null, // Updated field name
     overview: item.product_overview || null,
     image: getAssetUrl(item.product_image!),
 
@@ -50,6 +59,7 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
     discountPercentage: discountPercentage,
 
     inStock: item.product_instock!,
+    weight: item.product_weight || undefined,
 
     storeId: storeId!,
     storeName: storeName,
@@ -59,8 +69,8 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
 
     category: extractM2M(item.product_category, 'category_id')[0],
     materials: extractM2M(item.product_materials, 'material_id'),
-    colors: extraData?.colors ?? extractM2M(item.product_colors, 'colors_id'),
-    sizes: extraData?.sizes ?? extractM2M(item.product_sizes, 'sizes_id'),
+    colors: colors,
+    sizes: sizes,
     styles: extractM2M(item.product_styles, 'styles_id'),
     seasons: extractM2M(item.product_seasons, 'seasons_id'),
     genders: extractM2M(item.product_genders, 'gender_id'),
@@ -85,6 +95,7 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
         'product_discount',
         'product_image',
         'product_instock',
+        'product_weight',
         // Fetch nested vendor info from the store
         { product_store: ['id', 'store_name', 'store_slug', 'store_logo', { store_vendor: ['id', 'vendor_name', 'vendor_title'] }] },
         { product_category: [{ category_id: ['*'] }] },
@@ -110,12 +121,36 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
 };
 
 /**
+ * Helper to extract IDs from mixed content (numbers, junction objects, or expanded objects)
+ */
+const extractIds = (items: any[], key: string): number[] => {
+  if (!items || !Array.isArray(items)) return [];
+  return items.map((item: any) => {
+    // 1. If it's already a number (flat ID)
+    if (typeof item === 'number') return item;
+    
+    // 2. If it's an object
+    if (typeof item === 'object' && item !== null) {
+      // 2a. Check for junction key (e.g. colors_id)
+      if (key in item) {
+        const target = item[key];
+        if (typeof target === 'number') return target;
+        if (typeof target === 'object' && target !== null && target.id) return target.id;
+      }
+      // 2b. Fallback: maybe the item itself is the object with an id (if mapping was already done partially)
+      if (item.id) return item.id;
+    }
+    return null;
+  }).filter((id): id is number => typeof id === 'number');
+};
+
+/**
  * Fetches a single product by its ID using a robust 2-step fetch for variants.
  */
 export const fetchProductById = async (id: string): Promise<Product | null> => {
   try {
-    // Step 1: Fetch the main product data, which may only contain variant IDs.
-    // FIX: Removed 'as any' cast to allow for proper TypeScript type inference by the Directus SDK.
+    // Step 1: Fetch the main product data.
+    // We try to fetch expanded fields immediately.
     const productResult = await directus.request(readItem('products', Number(id), {
       fields: [
         '*',
@@ -126,19 +161,20 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
         { product_seasons: [{ seasons_id: ['*'] }] },
         { product_genders: [{ gender_id: ['*'] }] },
         { product_colors: [{ colors_id: ['*'] }] },
+        { product_sizes: [{ sizes_id: ['*'] }] },
         { product_reels: [{ reels_id: ['id'] }] },
       ]
     })) as unknown as DirectusProduct;
 
     if (!productResult) return null;
 
-    // Step 2: If we have variant IDs, fetch their full details separately.
-    const colorIds = (productResult.product_colors || []).filter(c => typeof c === 'number') as number[];
-    const sizeIds = (productResult.product_sizes || []).filter(s => typeof s === 'number') as number[];
+    // Step 2: Handle cases where expansion didn't return objects but just IDs or junction objects with IDs
+    // This makes it robust against permissions issues or API config where depth is limited.
+    const colorIds = extractIds(productResult.product_colors || [], 'colors_id');
+    const sizeIds = extractIds(productResult.product_sizes || [], 'sizes_id');
 
     let colors: Color[] = [];
     if (colorIds.length > 0) {
-      // FIX: Removed 'as any' cast to allow for proper TypeScript type inference by the Directus SDK.
       colors = await directus.request(readItems('colors', {
         filter: { id: { _in: colorIds } }
       })) as unknown as Color[];
@@ -146,7 +182,6 @@ export const fetchProductById = async (id: string): Promise<Product | null> => {
 
     let sizes: Size[] = [];
     if (sizeIds.length > 0) {
-      // FIX: Removed 'as any' cast to allow for proper TypeScript type inference by the Directus SDK.
       sizes = await directus.request(readItems('sizes', {
         filter: { id: { _in: sizeIds } }
       })) as unknown as Size[];

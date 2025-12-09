@@ -20,6 +20,7 @@ export interface Color {
 export interface Size {
   id: number;
   size_name: string;
+  size_title?: string; // Added size_title
 }
 
 // Redefined Product interface to match the new relational schema
@@ -35,6 +36,7 @@ export interface Product {
   discountPercentage?: number;
   
   inStock: boolean;
+  weight?: string | number; // Added weight
   
   // Relational Store Data
   storeId: string;

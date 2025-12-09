@@ -1,3 +1,4 @@
+
 import {
   AppConfiguration,
   Post,
@@ -35,12 +36,13 @@ export interface DirectusProduct {
   status: string;
   date_created?: string; // Standard Directus field
   product_name: string;
-  product__description: string | null;
+  product_description: string | null; // Fixed: removed double underscore
   product_overview: string | null;
   product_image: string;
   product_price: string;
   product_discount: string | null;
   product_instock: boolean;
+  product_weight: string | number | null; // Added product_weight
   product_store: any; // Can be ID or Store object
 
   // M2M junction fields (can be IDs or relational objects after deep fetch)
