@@ -1,12 +1,11 @@
 
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../services/storeService';
 import { fetchReels } from '../services/socialService';
 import { fetchProducts } from '../services/productService';
 import { Store as StoreType, Reel, Product } from '../types';
-import { Heart, MessageCircle, Share2, ShoppingBag, Volume2, VolumeX, Play, Pause, ChevronLeft } from 'lucide-react';
+import { Heart, MessageCircle, Share2, ShoppingBag, Volume2, VolumeX, Play, Pause, ChevronLeft, Shirt } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import StoryViewer from '../components/StoryViewer';
 
@@ -22,8 +21,20 @@ const FeedPost: React.FC<{
   const [isMuted, setIsMuted] = useState(true);
   const [showOverlayIcon, setShowOverlayIcon] = useState(false); // For Play/Pause animation
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  
+  // Loading State
+  const [isMediaLoaded, setIsMediaLoaded] = useState(false);
 
   const isVideo = reel.mimeType?.startsWith('video/');
+
+  // Initial check for cached video
+  useEffect(() => {
+    if (isVideo && videoRef.current) {
+      if (videoRef.current.readyState >= 3) {
+        setIsMediaLoaded(true);
+      }
+    }
+  }, [isVideo]);
 
   useEffect(() => {
     if (!isVideo || !videoRef.current) return;
@@ -37,11 +48,14 @@ const FeedPost: React.FC<{
     const observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
-          videoRef.current?.play().then(() => {
-            setIsPlaying(true);
-          }).catch(() => {
-            setIsPlaying(false);
-          });
+          // Only attempt play if data is loaded
+          if (videoRef.current?.readyState && videoRef.current.readyState >= 3) {
+             videoRef.current?.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {
+              setIsPlaying(false);
+            });
+          }
         } else {
           videoRef.current?.pause();
           setIsPlaying(false);
@@ -79,21 +93,35 @@ const FeedPost: React.FC<{
     }
   };
 
+  const handleLoadedData = () => {
+    setIsMediaLoaded(true);
+  };
+
   return (
     <article className="feed-post-reel">
       {/* Media Content */}
       <div className="reel-media-container" onClick={isVideo ? togglePlay : undefined}>
+        
+        {/* Fashion Loader Overlay (Visible until media is loaded) */}
+        {!isMediaLoaded && (
+          <div className="media-loader-overlay">
+            <Shirt size={48} className="fashion-loader-icon" strokeWidth={1} />
+          </div>
+        )}
+
         {isVideo ? (
           <>
             <video
               ref={videoRef}
               src={reel.media}
-              className="reel-video"
+              className={`reel-video ${isMediaLoaded ? 'fade-in' : 'hidden'}`}
               loop
               muted={isMuted}
               playsInline
               preload="metadata"
               poster={reel.cover} // Use the cover image as poster
+              onLoadedData={handleLoadedData}
+              onCanPlay={handleLoadedData}
             />
             {/* Play/Pause Animation Overlay */}
             <div className={`center-play-icon ${showOverlayIcon ? 'animate' : ''}`}>
@@ -101,7 +129,13 @@ const FeedPost: React.FC<{
             </div>
           </>
         ) : (
-          <img src={reel.media} alt="Post content" className="reel-image" loading="lazy" />
+          <img 
+            src={reel.media} 
+            alt="Post content" 
+            className={`reel-image ${isMediaLoaded ? 'fade-in' : 'hidden'}`} 
+            loading="lazy" 
+            onLoad={handleLoadedData}
+          />
         )}
         
         {/* Gradient Overlay for Text Readability */}
@@ -223,13 +257,34 @@ const SocialFeed: React.FC = () => {
         const fetchedStores = await fetchStores();
         setStores(fetchedStores);
         
-        // Filter stores that actually have reels for the Story bubbles
-        setStoryStores(fetchedStores.filter(s => s.reelIds && s.reelIds.length > 0));
-
-        // Fix: Removed 3rd argument from fetchReels
+        // Fetch first batch of reels
         const initialReels = await fetchReels(1, 5); 
         setReels(initialReels);
         
+        // --- Smart Story Sorting ---
+        // 1. Identify stores that are in the initial batch of reels (Recent Active)
+        const recentStoreIds = Array.from(new Set(initialReels.map(r => r.store.id)));
+        
+        // 2. Filter valid stores (those with reels)
+        let validStores = fetchedStores.filter(s => s.reelIds && s.reelIds.length > 0);
+
+        // 3. Sort: Stores in 'recentStoreIds' come first, maintaining their relative order from the feed
+        validStores.sort((a, b) => {
+            const indexA = recentStoreIds.indexOf(a.id);
+            const indexB = recentStoreIds.indexOf(b.id);
+            
+            // If both are recent, lower index (earlier in feed) wins
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+            // If only A is recent, it wins
+            if (indexA !== -1) return -1;
+            // If only B is recent, it wins
+            if (indexB !== -1) return 1;
+            // If neither is recent, keep original order (or sort alphabetically if preferred)
+            return 0;
+        });
+
+        setStoryStores(validStores);
+
         if (initialReels.length < 5) setHasMore(false);
 
         // Fetch products only for visible reels
@@ -258,7 +313,6 @@ const SocialFeed: React.FC = () => {
     const nextPage = page + 1;
     
     try {
-      // Fix: Removed 3rd argument from fetchReels
       const newReels = await fetchReels(nextPage, 5);
       
       if (newReels.length === 0) {
@@ -281,7 +335,7 @@ const SocialFeed: React.FC = () => {
     }
   }, [page, hasMore, isFetchingMore]);
 
-  // Infinite Scroll Observer
+  // Infinite Scroll Observer with PRELOAD
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -289,7 +343,13 @@ const SocialFeed: React.FC = () => {
           loadMoreReels();
         }
       },
-      { threshold: 1.0 }
+      { 
+        // IMPORTANT: Trigger load 800px BEFORE the user hits the bottom.
+        // This effectively hides the loader and prevents scroll jumping because
+        // new content is appended while the user is still viewing current content.
+        rootMargin: '800px', 
+        threshold: 0 
+      }
     );
 
     if (observerTarget.current) {
@@ -345,7 +405,7 @@ const SocialFeed: React.FC = () => {
               <div className="story-ring">
                 <img src={store.avatar} alt={store.name} className="story-img" />
               </div>
-              <span className="story-username">{store.name}</span>
+              <span className="story-name">{store.name}</span>
             </div>
           ))}
         </div>

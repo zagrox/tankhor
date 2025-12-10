@@ -1,4 +1,5 @@
 
+
 /* Home Page Redesign */
 
 .home-page {
@@ -12,6 +13,34 @@
   margin: 0 auto;
   padding: 0 1rem;
 }
+
+/* --- Loader & Transitions --- */
+.skeleton-loader {
+  position: absolute;
+  inset: 0;
+  background-color: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.fade-in {
+  opacity: 1;
+  transition: opacity 0.5s ease-in;
+}
+
+.opacity-0 {
+  opacity: 0;
+}
+
+/* Utility to ensure cover objects fill container */
+.obj-cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 
 /* --- 1. HERO SECTION --- */
 .hero-section {
@@ -194,6 +223,7 @@
   text-overflow: ellipsis;
   width: 100%;
   text-align: center;
+  text-shadow: none;
 }
 
 /* --- 3. VISUAL CATEGORIES --- */
@@ -332,13 +362,37 @@
   box-shadow: var(--shadow-md);
 }
 
-.reel-media-box img,
-.reel-media-box video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Play Overlay with Big Icon */
+.reel-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0,0,0,0.2);
+  transition: opacity 0.3s;
+  z-index: 2;
+  pointer-events: none; /* Let clicks pass through */
 }
 
+.reel-play-overlay.playing {
+  opacity: 0;
+}
+
+.big-play-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: transform 0.2s;
+}
+
+/* Small corner icon (fallback) */
 .reel-overlay-icon {
   position: absolute;
   top: 0.5rem;
@@ -412,6 +466,7 @@
   border-radius: var(--radius-xl);
   overflow: hidden;
   transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%; /* Ensure full height in grid */
 }
 
 .home-product-card:hover {
@@ -424,12 +479,22 @@
   aspect-ratio: 3 / 4;
   background-color: var(--bg-surface);
   position: relative;
+  overflow: hidden; /* CRITICAL: Crops content to aspect ratio */
 }
 
+/* CRITICAL: Force image to fill aspect-ratio box strictly */
 .home-product-img-box img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.home-product-card:hover .home-product-img-box img {
+  transform: scale(1.05);
 }
 
 .home-discount-badge {
@@ -442,10 +507,15 @@
   font-weight: 700;
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
+  z-index: 2;
 }
 
 .home-product-details {
   padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
 }
 
 .home-product-title {

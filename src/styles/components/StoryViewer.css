@@ -115,7 +115,7 @@
   color: var(--text-main);
   font-weight: 700;
   font-size: 0.9rem;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  text-shadow: none; /* REMOVED TEXT SHADOW */
 }
 
 .story-time {
@@ -151,6 +151,54 @@
   right: 0;
 }
 
+/* Visual Navigation Arrows */
+.nav-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(4px);
+  color: white;
+  border: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  transition: background-color 0.2s, transform 0.2s;
+  
+  /* Hidden by default (Mobile/Tablet) */
+  display: none;
+  opacity: 0; 
+}
+
+.story-media-container:hover .nav-arrow {
+  opacity: 1;
+}
+
+.nav-arrow:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.nav-arrow.left {
+  left: 1rem;
+}
+
+.nav-arrow.right {
+  right: 1rem;
+}
+
+/* Only show arrows on Desktop (screens larger than 1024px) */
+@media (min-width: 1024px) {
+  .nav-arrow {
+    display: flex;
+  }
+}
+
 /* Loader */
 .story-loader {
   position: absolute;
@@ -160,15 +208,6 @@
   justify-content: center;
   background-color: #111;
   z-index: 5;
-}
-
-.spinner {
-  width: 32px;
-  height: 32px;
-  border: 3px solid rgba(255,255,255,0.3);
-  border-top-color: white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
 }
 
 /* Footer Actions */

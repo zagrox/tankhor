@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Volume2, VolumeX, Heart, Share2, ShoppingBag, ChevronDown } from 'lucide-react';
+import { X, Volume2, VolumeX, Heart, Share2, ShoppingBag, ChevronDown, ChevronLeft, ChevronRight, Shirt } from 'lucide-react';
 import { Store, Reel, Product } from '../types';
 import { Link } from 'react-router-dom';
 import { fetchReelsByIds } from '../services/socialService';
@@ -36,6 +36,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
   const videoRef = useRef<HTMLVideoElement>(null);
   const progressInterval = useRef<number | null>(null);
   const startTime = useRef<number>(0);
+  const touchStartX = useRef<number>(0);
 
   const activeStore = stores[currentStoreIndex];
   const activeReel = currentReels[currentReelIndex];
@@ -115,6 +116,45 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
     }
   }, [currentReelIndex, currentStoreIndex]);
 
+  // Keyboard Navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'Escape') onClose();
+      if (e.key === ' ') {
+        e.preventDefault();
+        setIsPaused(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNext, handlePrev, onClose]);
+
+  // Swipe Logic
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    setIsPaused(true);
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsPaused(false);
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartX.current - touchEndX;
+    const swipeThreshold = 50;
+
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swiped Left -> Next
+        handleNext();
+      } else {
+        // Swiped Right -> Prev
+        handlePrev();
+      }
+    }
+  };
+
 
   // --- 4. Progress & Timer Logic ---
   useEffect(() => {
@@ -129,7 +169,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
       }
     } else {
       // Image logic: Manual timer
-      startTime.current = Date.now();
+      startTime.current = Date.now() - (progress / 100 * STORY_DURATION_IMAGE);
       
       const animate = () => {
         if (isPaused || isProductSheetOpen) return;
@@ -151,7 +191,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
     return () => {
       if (progressInterval.current) cancelAnimationFrame(progressInterval.current);
     };
-  }, [activeReel, isLoading, isPaused, handleNext, isProductSheetOpen]);
+  }, [activeReel, isLoading, isPaused, handleNext, isProductSheetOpen, progress]); // Added progress to deps to allow resume
 
 
   // --- 5. Video Specific Handlers ---
@@ -171,7 +211,11 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
 
   return (
     <div className="story-viewer-overlay">
-      <div className="story-media-container">
+      <div 
+        className="story-media-container"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         
         {/* Progress Bars */}
         <div className="story-progress-container">
@@ -213,7 +257,7 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
         {/* Main Media */}
         {isLoading ? (
           <div className="story-loader">
-            <div className="spinner"></div>
+            <Shirt size={48} className="fashion-loader-icon" strokeWidth={1} />
           </div>
         ) : (
           activeReel && (
@@ -237,7 +281,19 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
           )
         )}
 
-        {/* Touch Zones (Navigation) */}
+        {/* Desktop Navigation Arrows */}
+        {!isProductSheetOpen && (
+          <>
+            <button className="nav-arrow left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
+              <ChevronLeft size={36} />
+            </button>
+            <button className="nav-arrow right" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
+              <ChevronRight size={36} />
+            </button>
+          </>
+        )}
+
+        {/* Touch Zones (Invisible tap areas for easy mobile navigation) */}
         {!isProductSheetOpen && (
           <>
              <div 
@@ -245,16 +301,12 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
                 onClick={handlePrev} 
                 onMouseDown={() => setIsPaused(true)} 
                 onMouseUp={() => setIsPaused(false)}
-                onTouchStart={() => setIsPaused(true)} 
-                onTouchEnd={() => setIsPaused(false)}
              ></div>
              <div 
                 className="tap-zone right" 
                 onClick={handleNext}
                 onMouseDown={() => setIsPaused(true)} 
                 onMouseUp={() => setIsPaused(false)}
-                onTouchStart={() => setIsPaused(true)} 
-                onTouchEnd={() => setIsPaused(false)}
              ></div>
           </>
         )}

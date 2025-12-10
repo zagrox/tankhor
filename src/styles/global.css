@@ -30,3 +30,25 @@
 .gap-2 { gap: 0.5rem; }
 .cursor-pointer { cursor: pointer; }
 .hidden { display: none; }
+
+/* Fashion Loader Animation */
+@keyframes fashion-pulse {
+  0% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    color: var(--color-secondary);
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.5;
+  }
+}
+
+.fashion-loader-icon {
+  animation: fashion-pulse 1.5s infinite ease-in-out;
+  color: #fff;
+}

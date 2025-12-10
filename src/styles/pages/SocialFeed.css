@@ -1,9 +1,10 @@
 
+
 .social-page {
   /* Enforce full viewport height for the scrolling container */
   height: 100dvh; 
   width: 100%;
-  max-width: 30rem; /* Keep mobile width constraint on desktop */
+  max-width: 30rem; /* Mobile default */
   margin: 0 auto;
   
   /* Enable Scroll Snap */
@@ -17,6 +18,22 @@
   
   padding: 0;
   position: relative;
+}
+
+/* Widen the feed on Tablets */
+@media (min-width: 768px) {
+  .social-page {
+    max-width: 34rem;
+  }
+}
+
+/* Widen the feed on Desktop to match 9:16 monitor ratio better */
+@media (min-width: 1024px) {
+  .social-page {
+    max-width: 40rem; 
+    border-left: 1px solid var(--border-light);
+    border-right: 1px solid var(--border-light);
+  }
 }
 
 .social-page::-webkit-scrollbar {
@@ -87,6 +104,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: none;
 }
 
 /* --- REEL POST (Instagram Style) --- */
@@ -121,14 +139,11 @@
   justify-content: center;
 }
 
-@media (min-width: 768px) {
-  /* On desktop, we can keep the rounded corners and spacing if desired, 
-     or keep it full screen. Let's keep it full screen logic but contained. */
+@media (min-width: 1024px) {
   .feed-post-reel {
-    height: 100dvh;
-    border-radius: 0; 
-    margin-bottom: 0;
-    box-shadow: none;
+    /* On desktop, keep height but allow width to fill container */
+    height: 100dvh; 
+    border-radius: 0;
   }
 }
 
@@ -137,14 +152,46 @@
   height: 100%;
   position: relative;
   cursor: pointer;
+  background-color: #000;
+}
+
+/* Video Loader Overlay */
+.media-loader-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #111;
+  z-index: 2;
 }
 
 .reel-video, 
 .reel-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Ensures video fills the screen */
+  object-fit: contain; /* Ensure video is fully visible without cropping on wide containers */
   display: block;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+
+.reel-video.fade-in,
+.reel-image.fade-in {
+  opacity: 1;
+}
+
+.reel-video.hidden,
+.reel-image.hidden {
+  opacity: 0;
+}
+
+/* On mobile, cover is usually better to fill screen, on desktop contain prevents cropping */
+@media (max-width: 768px) {
+  .reel-video, 
+  .reel-image {
+    object-fit: cover;
+  }
 }
 
 /* Gradient Overlay - Essential for text readability */
@@ -397,6 +444,7 @@
   width: 100%;
   /* Ensure loader snaps to view if it's the last item */
   scroll-snap-align: center; 
+  min-height: 100px;
 }
 
 .loader-spinner {

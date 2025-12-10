@@ -1,15 +1,143 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, ShieldCheck, Truck, CreditCard, Zap, 
-  ArrowLeft, Play, Heart, Sparkles 
+  ArrowLeft, Play, Heart, Sparkles, Shirt
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../services/storeService';
 import { fetchProducts } from '../services/productService';
 import { fetchReels } from '../services/socialService';
 import { Store, Product, Reel } from '../types';
+import StoryViewer from '../components/StoryViewer';
+
+// --- Sub-Component: Home Reel Card (Handles Loading State & Hover Play) ---
+const HomeReelCard: React.FC<{ item: Reel; onClick: () => void }> = ({ item, onClick }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isVideo = item.mimeType?.startsWith('video/');
+
+  const handleMouseEnter = () => {
+    if (isVideo && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+      setIsPlaying(true);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (isVideo && videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0; 
+      setIsPlaying(false);
+    }
+  };
+
+  return (
+    <div 
+      className="reel-card-vertical cursor-pointer" 
+      onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className="reel-media-box">
+        {/* Loader Overlay */}
+        {!isLoaded && (
+          <div className="skeleton-loader">
+            <Shirt size={24} className="fashion-loader-icon text-gray-500" strokeWidth={1} />
+          </div>
+        )}
+
+        {isVideo ? (
+            <video 
+              ref={videoRef}
+              src={item.media} 
+              muted 
+              loop 
+              playsInline
+              className={`obj-cover ${isLoaded ? 'fade-in' : 'opacity-0'}`} 
+              onLoadedData={() => setIsLoaded(true)}
+              onCanPlay={() => setIsLoaded(true)}
+            />
+        ) : (
+            <img 
+              src={item.media} 
+              alt="Reel" 
+              loading="lazy" 
+              className={`obj-cover ${isLoaded ? 'fade-in' : 'opacity-0'}`}
+              onLoad={() => setIsLoaded(true)}
+            />
+        )}
+        
+        {/* Play Icon Overlay (Big Center Icon) */}
+        {isVideo && (
+          <div className={`reel-play-overlay ${isPlaying ? 'playing' : ''}`}>
+             <div className="big-play-icon">
+               <Play fill="white" size={28} className="ml-1" />
+             </div>
+          </div>
+        )}
+        
+        {/* Small Icon (Corner) - Only show for images or if not playing to indicate type */}
+        {!isVideo && (
+          <div className="reel-overlay-icon">
+             <Sparkles fill="white" size={20} />
+          </div>
+        )}
+
+        <div className="reel-stats-overlay">
+          <Heart size={14} fill="white" />
+          <span>{item.likes}</span>
+        </div>
+      </div>
+      <Link to={`/stores/${item.store.slug}`} className="reel-info-mini">
+        <img src={item.store.avatar} alt={item.store.name} className="reel-avatar-mini" />
+        <span className="reel-store-name-mini">{item.store.name}</span>
+      </Link>
+    </div>
+  );
+};
+
+// --- Sub-Component: Home Product Card (Handles Loading State) ---
+const HomeProductCard: React.FC<{ product: Product }> = ({ product }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <Link to={`/product/${product.id}`} className="home-product-card">
+      <div className="home-product-img-box">
+        {/* Loader Overlay */}
+        {!isLoaded && (
+          <div className="skeleton-loader">
+             <Shirt size={32} className="fashion-loader-icon text-gray-400" strokeWidth={1} />
+          </div>
+        )}
+        
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          loading="lazy" 
+          className={isLoaded ? 'fade-in' : 'opacity-0'}
+          onLoad={() => setIsLoaded(true)}
+        />
+        
+        {product.discountPercentage ? (
+            <span className="home-discount-badge">{product.discountPercentage}٪</span>
+        ) : null}
+      </div>
+      <div className="home-product-details">
+        <h3 className="home-product-title">{product.name}</h3>
+        <div className="home-product-meta">
+          <span className="home-store-name">{product.storeName}</span>
+          <span className="home-product-price">
+            {product.finalPrice.toLocaleString('fa-IR')} <span className="text-xs">تومان</span>
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+};
+
 
 const Home: React.FC = () => {
   const { setIsLoading } = useAppContext();
@@ -19,6 +147,11 @@ const Home: React.FC = () => {
   const [featuredStores, setFeaturedStores] = useState<Store[]>([]);
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [trendingReels, setTrendingReels] = useState<Reel[]>([]);
+
+  // Story Viewer State
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [viewerStores, setViewerStores] = useState<Store[]>([]);
+  const [viewerStartIndex, setViewerStartIndex] = useState(0);
 
   // Search State
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,6 +187,45 @@ const Home: React.FC = () => {
     }
   };
 
+  // --- Story & Reel Click Handlers ---
+
+  const handleStoryClick = (index: number) => {
+    const storesWithStories = featuredStores.filter(s => s.reelIds && s.reelIds.length > 0);
+    const clickedStore = featuredStores[index];
+    
+    if (clickedStore.reelIds && clickedStore.reelIds.length > 0) {
+       const newIndex = storesWithStories.findIndex(s => s.id === clickedStore.id);
+       if (newIndex !== -1) {
+         setViewerStores(storesWithStories);
+         setViewerStartIndex(newIndex);
+         setIsViewerOpen(true);
+       }
+    } else {
+       navigate(`/stores/${clickedStore.slug}`);
+    }
+  };
+
+  const handleReelClick = (index: number) => {
+    const reelStores: Store[] = trendingReels.map(reel => ({
+      id: reel.store.id,
+      name: reel.store.name,
+      slug: reel.store.slug,
+      handle: reel.store.handle,
+      avatar: reel.store.avatar,
+      coverImage: reel.store.coverImage,
+      followers: 0,
+      isFollowing: false,
+      description: '',
+      productIds: [],
+      reelIds: [reel.id],
+      vendor: undefined
+    }));
+
+    setViewerStores(reelStores);
+    setViewerStartIndex(index);
+    setIsViewerOpen(true);
+  };
+
   const smartChips = [
     { label: 'مانتو تابستانه', link: '/seasons/summer' },
     { label: 'لباس مجلسی', link: '/styles/formal' },
@@ -70,6 +242,14 @@ const Home: React.FC = () => {
   return (
     <div className="home-page">
       
+      {isViewerOpen && (
+        <StoryViewer 
+          stores={viewerStores}
+          initialStoreIndex={viewerStartIndex}
+          onClose={() => setIsViewerOpen(false)}
+        />
+      )}
+
       {/* --- 1. HERO SECTION --- */}
       <section className="hero-section">
         <div className="hero-bg-overlay"></div>
@@ -108,13 +288,17 @@ const Home: React.FC = () => {
       <section className="stories-ribbon-section">
         <div className="section-container">
           <div className="stories-scroll-wrapper">
-            {featuredStores.map((store) => (
-              <Link to={`/stores/${store.slug}`} key={store.id} className="story-item">
+            {featuredStores.map((store, index) => (
+              <div 
+                key={store.id} 
+                className="story-item cursor-pointer"
+                onClick={() => handleStoryClick(index)}
+              >
                 <div className="story-ring">
                   <img src={store.avatar} alt={store.name} className="story-avatar-img" loading="lazy" />
                 </div>
                 <span className="story-name">{store.name}</span>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -157,27 +341,12 @@ const Home: React.FC = () => {
           </div>
           
           <div className="reels-horizontal-scroll">
-            {trendingReels.map((item) => (
-              <div key={item.id} className="reel-card-vertical">
-                <div className="reel-media-box">
-                  {item.mimeType?.startsWith('video/') ? (
-                      <video src={item.media} muted loop className="obj-cover" />
-                  ) : (
-                      <img src={item.media} alt="Reel" loading="lazy" />
-                  )}
-                  <div className="reel-overlay-icon">
-                    {item.mimeType?.startsWith('video/') ? <Play fill="white" size={20} /> : <Sparkles fill="white" size={20} />}
-                  </div>
-                  <div className="reel-stats-overlay">
-                    <Heart size={14} fill="white" />
-                    <span>{item.likes}</span>
-                  </div>
-                </div>
-                <Link to={`/stores/${item.store.slug}`} className="reel-info-mini">
-                  <img src={item.store.avatar} alt={item.store.name} className="reel-avatar-mini" />
-                  <span className="reel-store-name-mini">{item.store.name}</span>
-                </Link>
-              </div>
+            {trendingReels.map((item, index) => (
+              <HomeReelCard 
+                key={item.id} 
+                item={item} 
+                onClick={() => handleReelClick(index)} 
+              />
             ))}
           </div>
         </div>
@@ -198,23 +367,7 @@ const Home: React.FC = () => {
 
           <div className="home-products-grid">
             {latestProducts.map((product) => (
-              <Link to={`/product/${product.id}`} key={product.id} className="home-product-card">
-                <div className="home-product-img-box">
-                  <img src={product.image} alt={product.name} loading="lazy" />
-                  {product.discountPercentage ? (
-                     <span className="home-discount-badge">{product.discountPercentage}٪</span>
-                  ) : null}
-                </div>
-                <div className="home-product-details">
-                  <h3 className="home-product-title">{product.name}</h3>
-                  <div className="home-product-meta">
-                    <span className="home-store-name">{product.storeName}</span>
-                    <span className="home-product-price">
-                      {product.finalPrice.toLocaleString('fa-IR')} <span className="text-xs">تومان</span>
-                    </span>
-                  </div>
-                </div>
-              </Link>
+              <HomeProductCard key={product.id} product={product} />
             ))}
           </div>
         </div>

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -18,7 +17,8 @@ import {
   Minus,
   Plus,
   Info,
-  Play
+  Play,
+  Shirt
 } from 'lucide-react';
 
 const ProductDetail: React.FC = () => {
@@ -29,6 +29,9 @@ const ProductDetail: React.FC = () => {
   const [product, setProduct] = useState<Product | null>(null);
   const [reels, setReels] = useState<Reel[]>([]);
   const [error, setError] = useState<string | null>(null);
+  
+  // Image Loading State
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   // Selection State
   const [selectedColor, setSelectedColor] = useState<Color | null>(null);
@@ -46,6 +49,7 @@ const ProductDetail: React.FC = () => {
         
         if (data) {
           setProduct(data);
+          setIsImageLoaded(false); // Reset image load state on new product
           // Default selections
           if (data.colors && data.colors.length > 0) {
             setSelectedColor(data.colors[0]);
@@ -112,10 +116,18 @@ const ProductDetail: React.FC = () => {
         {/* RIGHT COLUMN: Image Gallery */}
         <div className="product-gallery-section">
           <div className="main-image-wrapper">
+             {/* Loader Overlay */}
+            {!isImageLoaded && (
+              <div className="image-loader-overlay">
+                 <Shirt size={48} className="fashion-loader-icon text-gray-400" strokeWidth={1} />
+              </div>
+            )}
+            
             <img 
               src={product.image} 
               alt={product.name} 
-              className="main-img" 
+              className={`main-img ${isImageLoaded ? 'fade-in' : 'opacity-0'}`}
+              onLoad={() => setIsImageLoaded(true)}
               onError={(e) => (e.target as HTMLImageElement).src = 'https://placehold.co/600x800?text=No+Image'}
             />
             {product.discountPercentage ? (
