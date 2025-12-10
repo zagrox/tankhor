@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { 
@@ -14,7 +13,8 @@ import {
   ChevronRight,
   ChevronLeft,
   LayoutGrid,
-  Users
+  Users,
+  Store // Imported Store icon
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
@@ -52,6 +52,7 @@ const Sidebar: React.FC = () => {
     { name: 'خانه', path: '/', icon: <Home size={24} /> },
     { name: 'فید اجتماعی', path: '/social', icon: <Users size={24} /> },
     { name: 'فروشگاه', path: '/marketplace', icon: <ShoppingBag size={24} /> },
+    { name: 'فروشندگان', path: '/stores', icon: <Store size={24} /> }, // Added Stores link
     { name: 'دسته‌بندی', path: '/filters', icon: <LayoutGrid size={24} /> },
     { name: 'وبلاگ', path: '/blog', icon: <Newspaper size={24} /> },
   ];

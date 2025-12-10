@@ -2,7 +2,7 @@
 
 import { readItems } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
-import { Store, Product } from '../types';
+import { Store, Product, Vendor } from '../types';
 import { DirectusStore } from '../types/directus';
 import { fetchProducts } from './productService';
 
@@ -23,6 +23,11 @@ const mapStoreData = (item: Partial<DirectusStore>): Store => {
     }).filter((id): id is number => id !== null);
   }
 
+  // Ensure store_vendor is treated correctly if it's an object (expanded)
+  const vendor = (typeof item.store_vendor === 'object' && item.store_vendor !== null) 
+    ? (item.store_vendor as Vendor) 
+    : undefined;
+
   return {
     id: String(item.id!),
     name: item.store_name!,
@@ -37,6 +42,7 @@ const mapStoreData = (item: Partial<DirectusStore>): Store => {
     description: item.store_description || 'اطلاعات فروشگاه به زودی تکمیل می‌شود.',
     productIds: item.store_products || [],
     reelIds: reelIds,
+    vendor: vendor, // Map the vendor
     
     channel: item.store_channel || undefined,
     instagram: item.store_instagram || undefined,
@@ -59,7 +65,17 @@ export const fetchStores = async (): Promise<Store[]> => {
   try {
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const result = await directus.request(readItems('stores', {
-      fields: ['id', 'store_name', 'store_slug', 'store_logo', 'store_reels', 'store_cover', 'store_color'],
+      fields: [
+        'id', 
+        'store_name', 
+        'store_slug', 
+        'store_logo', 
+        'store_reels', 
+        'store_cover', 
+        'store_color',
+        // Fetch expanded vendor details
+        { store_vendor: ['id', 'vendor_name', 'vendor_title', 'vendor_color'] }
+      ],
       filter: { status: { _eq: 'published' } },
       limit: 10
     })) as unknown as DirectusStore[];
@@ -77,7 +93,12 @@ export const fetchStoreBySlug = async (slug: string): Promise<{ store: Store | n
   try {
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const storeResults = await directus.request(readItems('stores', {
-      fields: ['*', 'store_reels'],
+      fields: [
+        '*', 
+        'store_reels',
+        // Fetch expanded vendor details
+        { store_vendor: ['id', 'vendor_name', 'vendor_title', 'vendor_color'] }
+      ],
       filter: {
         store_slug: { _eq: slug },
         status: { _eq: 'published' }

@@ -17,6 +17,7 @@ import Cart from './pages/Cart';
 import FiltersPage from './pages/FiltersPage';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
+import StoresPage from './pages/StoresPage'; // New Import
 
 // Simple placeholder components for unused routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -37,6 +38,9 @@ const App: React.FC = () => {
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/filters" element={<FiltersPage />} />
             
+            {/* New Stores Directory Route */}
+            <Route path="/stores" element={<StoresPage />} />
+
             {/* SEO-friendly Category Routes */}
             <Route path="/seasons/:slug" element={<CategoryPage type="season" />} />
             <Route path="/styles/:slug" element={<CategoryPage type="style" />} />

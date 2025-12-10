@@ -14,7 +14,7 @@ import './styles/components/Sidebar.css';
 import './styles/components/Loader.css';
 import './styles/components/SecondarySidebar.css';
 import './styles/components/MultiSelectDropdown.css'; 
-import './styles/components/StoryViewer.css'; // New Import
+import './styles/components/StoryViewer.css'; 
 
 /* Page Styles */
 import './styles/pages/Home.css';
@@ -26,6 +26,7 @@ import './styles/pages/Blog.css';
 import './styles/pages/Cart.css';
 import './styles/pages/FiltersPage.css';
 import './styles/pages/CategoryPage.css';
+import './styles/pages/StoresPage.css'; // New Import
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

@@ -86,9 +86,13 @@ const mapProductData = (item: Partial<DirectusProduct>, extraData?: { colors?: C
 
 /**
  * Fetches a list of published products.
+ * @param options Object containing filtering criteria and/or query options like 'limit'.
  */
-export const fetchProducts = async (filter?: any): Promise<Product[]> => {
+export const fetchProducts = async (options?: any): Promise<Product[]> => {
   try {
+    // FIX: Extract 'limit' from the options so it isn't passed as a filter field
+    const { limit, ...filterCriteria } = options || {};
+
     // FIX: Removed 'as any' casts to allow for proper TypeScript type inference by the Directus SDK.
     const result = await directus.request(readItems('products', {
       fields: [
@@ -111,9 +115,10 @@ export const fetchProducts = async (filter?: any): Promise<Product[]> => {
       ],
       filter: {
         status: { _eq: 'published' },
-        ...filter
+        ...filterCriteria
       },
-      sort: ['-date_created']
+      sort: ['-date_created'],
+      ...(limit !== undefined ? { limit } : {}) // Apply limit to the query config, not filter
     })) as unknown as DirectusProduct[];
 
     return result.map(item => mapProductData(item));
