@@ -110,7 +110,7 @@ const SecondarySidebar: React.FC = () => {
     label: 'نوع فروشگاه',
     options: vendors.map(v => ({
       value: String(v.id),
-      label: v.vendor_title
+      label: v.vendor_name // Changed from vendor_title to vendor_name
     }))
   }];
 

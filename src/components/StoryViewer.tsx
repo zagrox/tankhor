@@ -116,11 +116,11 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
     }
   }, [currentReelIndex, currentStoreIndex]);
 
-  // Keyboard Navigation
+  // Keyboard Navigation (RTL: Left is Next, Right is Prev)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowRight') handleNext();
-      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handlePrev(); // Swapped for RTL
+      if (e.key === 'ArrowLeft') handleNext();  // Swapped for RTL
       if (e.key === 'Escape') onClose();
       if (e.key === ' ') {
         e.preventDefault();
@@ -146,10 +146,10 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
 
     if (Math.abs(diff) > swipeThreshold) {
       if (diff > 0) {
-        // Swiped Left -> Next
+        // Swiped Left (finger moves right to left) -> Go Next
         handleNext();
       } else {
-        // Swiped Right -> Prev
+        // Swiped Right (finger moves left to right) -> Go Prev
         handlePrev();
       }
     }
@@ -281,30 +281,34 @@ const StoryViewer: React.FC<StoryViewerProps> = ({ stores, initialStoreIndex, on
           )
         )}
 
-        {/* Desktop Navigation Arrows */}
+        {/* Desktop Navigation Arrows - RTL Logic Swapped */}
         {!isProductSheetOpen && (
           <>
-            <button className="nav-arrow left" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
+            {/* Left Button -> Go Next */}
+            <button className="nav-arrow left" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
               <ChevronLeft size={36} />
             </button>
-            <button className="nav-arrow right" onClick={(e) => { e.stopPropagation(); handleNext(); }}>
+            {/* Right Button -> Go Prev */}
+            <button className="nav-arrow right" onClick={(e) => { e.stopPropagation(); handlePrev(); }}>
               <ChevronRight size={36} />
             </button>
           </>
         )}
 
-        {/* Touch Zones (Invisible tap areas for easy mobile navigation) */}
+        {/* Touch Zones (Invisible tap areas) - RTL Logic Swapped */}
         {!isProductSheetOpen && (
           <>
+             {/* Left Zone -> Go Next */}
              <div 
                 className="tap-zone left" 
-                onClick={handlePrev} 
+                onClick={handleNext} 
                 onMouseDown={() => setIsPaused(true)} 
                 onMouseUp={() => setIsPaused(false)}
              ></div>
+             {/* Right Zone -> Go Prev */}
              <div 
                 className="tap-zone right" 
-                onClick={handleNext}
+                onClick={handlePrev}
                 onMouseDown={() => setIsPaused(true)} 
                 onMouseUp={() => setIsPaused(false)}
              ></div>

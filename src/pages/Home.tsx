@@ -12,6 +12,35 @@ import { fetchReels } from '../services/socialService';
 import { Store, Product, Reel } from '../types';
 import StoryViewer from '../components/StoryViewer';
 
+// --- Sub-Component: Story Bubble (Handles specific loader) ---
+const StoryBubble: React.FC<{ store: Store; onClick: () => void }> = ({ store, onClick }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div 
+      className="story-item cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="story-ring">
+        {/* Specific Loader for Story Avatar */}
+        {!isLoaded && (
+          <div className="story-avatar-loader">
+            <Sparkles size={24} className="story-loader-icon" strokeWidth={1.5} />
+          </div>
+        )}
+        <img 
+          src={store.avatar} 
+          alt={store.name} 
+          className={`story-avatar-img ${isLoaded ? 'fade-in' : 'hidden'}`} 
+          loading="lazy" 
+          onLoad={() => setIsLoaded(true)}
+        />
+      </div>
+      <span className="story-name">{store.name}</span>
+    </div>
+  );
+};
+
 // --- Sub-Component: Home Reel Card (Handles Loading State & Hover Play) ---
 const HomeReelCard: React.FC<{ item: Reel; onClick: () => void }> = ({ item, onClick }) => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -145,6 +174,7 @@ const Home: React.FC = () => {
 
   // Data State
   const [featuredStores, setFeaturedStores] = useState<Store[]>([]);
+  const [storyStores, setStoryStores] = useState<Store[]>([]); // Separated state for Stories
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [trendingReels, setTrendingReels] = useState<Reel[]>([]);
 
@@ -171,6 +201,30 @@ const Home: React.FC = () => {
         setLatestProducts(productsData);
         setTrendingReels(reelsData);
 
+        // --- SORT STORIES BY RECENCY ---
+        // 1. Get IDs of stores in the latest reels (ordered by recency)
+        const recentStoreIds = Array.from(new Set(reelsData.map(r => r.store.id)));
+
+        // 2. Filter stores that actually have reels
+        const storesWithStories = storesData.filter(s => s.reelIds && s.reelIds.length > 0);
+
+        // 3. Sort: Recent stores first, then others
+        const sortedStories = [...storesWithStories].sort((a, b) => {
+          const idxA = recentStoreIds.indexOf(a.id);
+          const idxB = recentStoreIds.indexOf(b.id);
+          
+          // If both are recent, lower index (more recent) wins
+          if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+          // If only A is recent, it wins
+          if (idxA !== -1) return -1;
+          // If only B is recent, it wins
+          if (idxB !== -1) return 1;
+          
+          return 0;
+        });
+
+        setStoryStores(sortedStories);
+
       } catch (e) {
         console.error("Home data error", e);
       } finally {
@@ -190,19 +244,10 @@ const Home: React.FC = () => {
   // --- Story & Reel Click Handlers ---
 
   const handleStoryClick = (index: number) => {
-    const storesWithStories = featuredStores.filter(s => s.reelIds && s.reelIds.length > 0);
-    const clickedStore = featuredStores[index];
-    
-    if (clickedStore.reelIds && clickedStore.reelIds.length > 0) {
-       const newIndex = storesWithStories.findIndex(s => s.id === clickedStore.id);
-       if (newIndex !== -1) {
-         setViewerStores(storesWithStories);
-         setViewerStartIndex(newIndex);
-         setIsViewerOpen(true);
-       }
-    } else {
-       navigate(`/stores/${clickedStore.slug}`);
-    }
+    // Since storyStores is already sorted and filtered, we can use it directly
+    setViewerStores(storyStores);
+    setViewerStartIndex(index);
+    setIsViewerOpen(true);
   };
 
   const handleReelClick = (index: number) => {
@@ -284,21 +329,16 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* --- 2. STORIES RIBBON --- */}
+      {/* --- 2. STORIES RIBBON (SORTED RECENT FIRST) --- */}
       <section className="stories-ribbon-section">
         <div className="section-container">
           <div className="stories-scroll-wrapper">
-            {featuredStores.map((store, index) => (
-              <div 
+            {storyStores.map((store, index) => (
+              <StoryBubble 
                 key={store.id} 
-                className="story-item cursor-pointer"
-                onClick={() => handleStoryClick(index)}
-              >
-                <div className="story-ring">
-                  <img src={store.avatar} alt={store.name} className="story-avatar-img" loading="lazy" />
-                </div>
-                <span className="story-name">{store.name}</span>
-              </div>
+                store={store} 
+                onClick={() => handleStoryClick(index)} 
+              />
             ))}
           </div>
         </div>
@@ -352,28 +392,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* --- 5. LATEST PRODUCTS (Commerce) --- */}
-      <section className="latest-products-section">
-        <div className="section-container">
-          <div className="section-header">
-            <div>
-              <h2>جدیدترین محصولات</h2>
-              <p className="text-sm text-gray-500 mt-1">تازه‌ترین کالکشن‌های اضافه شده به بازار</p>
-            </div>
-            <Link to="/marketplace" className="see-more-link">
-              فروشگاه <ArrowLeft size={16} />
-            </Link>
-          </div>
-
-          <div className="home-products-grid">
-            {latestProducts.map((product) => (
-              <HomeProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* --- 6. FEATURED BOUTIQUES --- */}
+      {/* --- 6. FEATURED BOUTIQUES (Default Sort) --- */}
       <section className="featured-stores-section">
         <div className="section-container">
           <div className="section-header">
@@ -406,6 +425,29 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* --- 5. LATEST PRODUCTS (Commerce) --- */}
+      <section className="latest-products-section">
+        <div className="section-container">
+          <div className="section-header">
+            <div>
+              <h2>جدیدترین محصولات</h2>
+              <p className="text-sm text-gray-500 mt-1">تازه‌ترین کالکشن‌های اضافه شده به بازار</p>
+            </div>
+            <Link to="/marketplace" className="see-more-link">
+              فروشگاه <ArrowLeft size={16} />
+            </Link>
+          </div>
+
+          <div className="home-products-grid">
+            {latestProducts.map((product) => (
+              <HomeProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      
 
       {/* --- 7. AI TEASER --- */}
       <section className="ai-teaser-section">
@@ -450,7 +492,6 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
-
     </div>
   );
 };

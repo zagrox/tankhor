@@ -25,6 +25,22 @@
   z-index: 1;
 }
 
+.story-avatar-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-surface);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.story-loader-icon {
+  color: var(--color-secondary);
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
 .fade-in {
   opacity: 1;
   transition: opacity 0.5s ease-in;
@@ -32,6 +48,10 @@
 
 .opacity-0 {
   opacity: 0;
+}
+
+.hidden {
+  display: none;
 }
 
 /* Utility to ensure cover objects fill container */
@@ -200,6 +220,7 @@
   padding: 2px;
   background: linear-gradient(to top right, #fbbf24, #f97316, #9333ea);
   transition: transform 0.2s;
+  position: relative; /* For Loader */
 }
 
 .story-item:hover .story-ring {
