@@ -1,5 +1,5 @@
 
-import { login as sdkLogin, logout, readMe, createUser, updateMe } from '@directus/sdk';
+import { login as sdkLogin, logout, readMe, createUser, updateMe, createItem } from '@directus/sdk';
 import { directus, getAssetUrl } from './client';
 import { UserProfile } from '../types';
 
@@ -55,8 +55,24 @@ export const authService = {
         status: 'active'
       }));
 
-      // Auto login after registration
-      return await authService.login(email, password);
+      // Auto login after registration to get the token
+      const user = await authService.login(email, password);
+
+      // Create the Profile Item
+      // The 'user_created' field is automatically populated by Directus with the current user's ID
+      // because we are making this request authenticated immediately after login.
+      try {
+        await directus.request(createItem('profiles', {
+          status: 'published',
+          profile_username: `${firstName} ${lastName}`.trim(),
+          profile_type: 'personal',
+        }));
+      } catch (profileError) {
+        // Log profile creation error but don't block the user from proceeding since account creation succeeded
+        console.error('Failed to create profile record:', profileError);
+      }
+
+      return user;
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;

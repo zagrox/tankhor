@@ -65,7 +65,7 @@ const Sidebar: React.FC = () => {
     { name: 'سبد خرید', path: '/cart', icon: <ShoppingCart size={24} /> },
     { name: profileLinkName, path: profileLinkPath, icon: <User size={24} /> },
     // Only show settings if logged in, otherwise hide or maybe keep for app settings
-    ...(isAuthenticated ? [{ name: 'تنظیمات', path: '/profile', icon: <Settings size={24} /> }] : []),
+    // ...(isAuthenticated ? [{ name: 'تنظیمات', path: '/profile', icon: <Settings size={24} /> }] : []),
   ];
 
   return (

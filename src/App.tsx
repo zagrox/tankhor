@@ -20,6 +20,7 @@ import CategoryPage from './pages/CategoryPage';
 import StoresPage from './pages/StoresPage'; 
 import AuthPage from './pages/AuthPage'; // New Auth Import
 import Profile from './pages/Profile'; // New Profile Import
+import SettingsPage from './pages/SettingsPage'; // New Settings Import
 
 // Simple placeholder components for unused routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -43,6 +44,7 @@ const App: React.FC = () => {
             {/* Auth Routes */}
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<SettingsPage />} />
 
             {/* New Stores Directory Route */}
             <Route path="/stores" element={<StoresPage />} />

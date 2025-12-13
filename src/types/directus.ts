@@ -30,6 +30,24 @@ export interface DirectusReel {
   reel_cover: string | null; // Added reel_cover field
 }
 
+export interface DirectusProfile {
+  id: number;
+  status: string;
+  user_created: string; // UUID of the user
+  date_created: string;
+  user_updated?: string;
+  date_updated?: string;
+  profile_type?: string;
+  profile_gender?: string;
+  profile_mobile?: string;
+  profile_birthday?: string;
+  profile_telegram?: string;
+  profile_instagram?: string;
+  profile_color?: string;
+  profile_username?: string;
+  profile_stores?: number[];
+}
+
 export interface DirectusProduct {
   id: number;
   status: string;
@@ -109,6 +127,7 @@ export interface DirectusSchema {
   // New Collections
   blogs: DirectusBlog[];
   reels: DirectusReel[];
+  profiles: DirectusProfile[];
 
   // Filter Collections
   category: Category[];

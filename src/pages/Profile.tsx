@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
@@ -70,7 +71,10 @@ const Profile: React.FC = () => {
              <p>مدیریت آدرس‌های ارسال سفارش</p>
            </div>
 
-           <div className="dash-card">
+           <div 
+             className="dash-card" 
+             onClick={() => navigate('/settings')}
+           >
              <div className="dash-icon"><Settings size={24} className="text-gray-500" /></div>
              <h3>تنظیمات حساب</h3>
              <p>ویرایش اطلاعات شخصی و تغییر رمز عبور</p>
