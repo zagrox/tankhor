@@ -1,4 +1,5 @@
 
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -9,7 +10,9 @@ import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../services/storeService';
 import { fetchProducts } from '../services/productService';
 import { fetchReels } from '../services/socialService';
-import { Store, Product, Reel } from '../types';
+import { fetchStyles } from '../services/categoryService';
+import { getAssetUrl } from '../services/client';
+import { Store, Product, Reel, Style } from '../types';
 import StoryViewer from '../components/StoryViewer';
 
 // --- Sub-Component: Story Bubble (Handles specific loader) ---
@@ -169,7 +172,7 @@ const HomeProductCard: React.FC<{ product: Product }> = ({ product }) => {
 
 
 const Home: React.FC = () => {
-  const { setIsLoading } = useAppContext();
+  const { setIsLoading, appConfig } = useAppContext();
   const navigate = useNavigate();
 
   // Data State
@@ -177,6 +180,7 @@ const Home: React.FC = () => {
   const [storyStores, setStoryStores] = useState<Store[]>([]); // Separated state for Stories
   const [latestProducts, setLatestProducts] = useState<Product[]>([]);
   const [trendingReels, setTrendingReels] = useState<Reel[]>([]);
+  const [homeStyles, setHomeStyles] = useState<Style[]>([]);
 
   // Story Viewer State
   const [isViewerOpen, setIsViewerOpen] = useState(false);
@@ -191,15 +195,17 @@ const Home: React.FC = () => {
       setIsLoading(true);
       try {
         // Fetch data in parallel
-        const [storesData, productsData, reelsData] = await Promise.all([
+        const [storesData, productsData, reelsData, stylesData] = await Promise.all([
           fetchStores(),
           fetchProducts({ limit: 12 }), // Fetch 12 latest products to fill compact grid
-          fetchReels(1, 10) // Fetch latest reels
+          fetchReels(1, 10), // Fetch latest reels
+          fetchStyles() // Fetch styles for visual categories
         ]);
 
         setFeaturedStores(storesData);
         setLatestProducts(productsData);
         setTrendingReels(reelsData);
+        setHomeStyles(stylesData);
 
         // --- SORT STORIES BY RECENCY ---
         // 1. Get IDs of stores in the latest reels (ordered by recency)
@@ -241,6 +247,8 @@ const Home: React.FC = () => {
     }
   };
 
+  const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
+
   // --- Story & Reel Click Handlers ---
 
   const handleStoryClick = (index: number) => {
@@ -278,11 +286,10 @@ const Home: React.FC = () => {
     { label: 'کالکشن جدید', link: '/marketplace' },
   ];
 
-  const categories = [
-    { title: 'کالکشن فصل', subtitle: 'بهار و تابستان ۱۴۰۴', image: 'https://images.unsplash.com/photo-1540221652346-e5dd6b50f3e7?auto=format&fit=crop&q=80&w=600', link: '/seasons/spring' },
-    { title: 'استایل خیابانی', subtitle: 'ترندهای روز تهران', image: 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?auto=format&fit=crop&q=80&w=600', link: '/styles/street' },
-    { title: 'اکسسوری', subtitle: 'کیف، کفش و عینک', image: 'https://images.unsplash.com/photo-1576053139778-7e32f2ae3cfd?auto=format&fit=crop&q=80&w=600', link: '/marketplace' },
-  ];
+  // Hero background override
+  const heroStyle = appConfig?.app_hero 
+    ? { backgroundImage: `url('${getAssetUrl(appConfig.app_hero)}')` }
+    : undefined;
 
   return (
     <div className="home-page">
@@ -296,7 +303,7 @@ const Home: React.FC = () => {
       )}
 
       {/* --- 1. HERO SECTION --- */}
-      <section className="hero-section">
+      <section className="hero-section" style={heroStyle}>
         <div className="hero-bg-overlay"></div>
         <div className="hero-content">
           <h1 className="hero-title">
@@ -347,7 +354,7 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* --- 3. VISUAL CATEGORIES --- */}
+      {/* --- 3. VISUAL CATEGORIES (STYLES) --- */}
       <section className="visual-categories-section">
         <div className="section-container">
           <div className="section-header">
@@ -357,15 +364,23 @@ const Home: React.FC = () => {
             </Link>
           </div>
           <div className="categories-grid">
-            {categories.map((cat, idx) => (
-              <Link to={cat.link} key={idx} className="category-card-visual">
-                <img src={cat.image} alt={cat.title} className="cat-bg-img" loading="lazy" />
+            {homeStyles.slice(0, 3).map((style) => (
+              <Link to={`/styles/${toSlug(style.style_name)}`} key={style.id} className="category-card-visual">
+                <img 
+                  src={getAssetUrl(style.style_image)} 
+                  alt={style.style_title} 
+                  className="cat-bg-img" 
+                  loading="lazy" 
+                />
                 <div className="cat-overlay">
-                  <h3>{cat.title}</h3>
-                  <span>{cat.subtitle}</span>
+                  <h3>{style.style_title}</h3>
+                  <span>{style.style_about}</span>
                 </div>
               </Link>
             ))}
+            {homeStyles.length === 0 && (
+                 <div className="text-center w-full py-4 text-gray-400">در حال بارگذاری استایل‌ها...</div>
+            )}
           </div>
         </div>
       </section>

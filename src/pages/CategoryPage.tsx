@@ -1,13 +1,78 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import { Product } from '../types';
 import { fetchCategoryInfoAndProducts, CategoryType } from '../services/categoryService';
-import { AlertCircle, ShoppingBag } from 'lucide-react';
+import { AlertCircle, ShoppingBag, Shirt } from 'lucide-react';
 
 interface CategoryPageProps {
   type: CategoryType;
 }
+
+// Sub-component to match Marketplace card design and handle image loading
+const CategoryProductCard: React.FC<{ product: Product }> = ({ product }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <Link to={`/product/${product.id}`} className="store-product-card">
+      <div className="card-img-wrapper">
+        {/* Loader Overlay */}
+        {!isLoaded && (
+          <div className="skeleton-loader">
+             <Shirt size={32} className="fashion-loader-icon text-gray-400" strokeWidth={1} />
+          </div>
+        )}
+        
+        <img 
+          src={product.image} 
+          alt={product.name} 
+          className={`card-img ${isLoaded ? 'fade-in' : ''}`}
+          loading="lazy"
+          onLoad={() => setIsLoaded(true)}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=No+Image';
+            setIsLoaded(true);
+          }}
+        />
+        
+        {/* Discount Badge */}
+        {product.discountPercentage ? (
+           <div className="discount-badge-card">
+             {product.discountPercentage}٪
+           </div>
+        ) : null}
+
+        {/* Category Badge */}
+        {product.category && (
+          <div className="category-badge">{product.category.category_name}</div>
+        )}
+      </div>
+      
+      <div className="card-body">
+        <div className="card-body-header">
+           <h3 className="card-title">{product.name}</h3>
+           <span className="card-store">{product.storeName || 'فروشگاه'}</span>
+        </div>
+        
+        <div className="card-footer">
+          <div className="card-price-column">
+            {product.discountPercentage ? (
+               <span className="price-old">{product.price.toLocaleString('fa-IR')}</span>
+            ) : null}
+            <div className="card-price">
+              {product.finalPrice.toLocaleString('fa-IR')} 
+              <span>تومان</span>
+            </div>
+          </div>
+          <button className="btn-add-mini" onClick={(e) => e.preventDefault()}>
+            <ShoppingBag size={18} />
+          </button>
+        </div>
+      </div>
+    </Link>
+  );
+};
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
   const { slug } = useParams<{ slug: string }>();
@@ -42,7 +107,6 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
     loadData();
   }, [type, slug, setIsLoading]);
 
-  // FIX: Added 'category' to the record to match the CategoryType definition.
   const typeTranslations: Record<CategoryType, string> = {
     season: 'فصل',
     style: 'سبک',
@@ -88,33 +152,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ type }) => {
       {products.length > 0 ? (
         <div className="category-products-grid">
           {products.map(product => (
-            <Link to={`/product/${product.id}`} key={product.id} className="store-product-card">
-              <div className="card-img-wrapper">
-                <img 
-                  src={product.image} 
-                  alt={product.name} 
-                  className="card-img"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://placehold.co/400?text=No+Image';
-                  }}
-                />
-                {/* FIX: Render the `category_name` property of the `product.category` object, not the object itself. */}
-                <div className="category-badge">{product.category?.category_name}</div>
-              </div>
-              <div className="card-body">
-                <h3 className="card-title">{product.name}</h3>
-                <span className="card-store">{product.storeName || 'فروشگاه'}</span>
-                <div className="card-footer">
-                  <div className="card-price">
-                    {product.price.toLocaleString('fa-IR')} 
-                    <span>تومان</span>
-                  </div>
-                  <button className="btn-add-mini" onClick={(e) => e.preventDefault()}>
-                    <ShoppingBag size={16} />
-                  </button>
-                </div>
-              </div>
-            </Link>
+            <CategoryProductCard key={product.id} product={product} />
           ))}
         </div>
       ) : (

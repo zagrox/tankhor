@@ -77,7 +77,7 @@ const Cart: React.FC = () => {
             return (
               <div key={item.productId} className="cart-item-card">
                 <Link to={`/product/${product.id}`} className="cart-item-image">
-                  <img src={product.image} alt={product.name} />
+                  <img src="https://crm.tankhor.com/assets/1f1b568f-1a16-4edc-89ed-71d2ad4870cb" alt={product.name} />
                 </Link>
                 
                 <div className="cart-item-details">

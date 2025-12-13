@@ -1,195 +1,99 @@
-import React, { useEffect, useState } from 'react';
+
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../context/AppContext';
 import { 
-  fetchSeasons, 
-  fetchStyles, 
-  fetchMaterials, 
-  fetchGenders,
-  fetchVendors
-} from '../services/categoryService';
-import { Season, Style, Material, Gender, Vendor } from '../types';
-import { 
-  Users, 
-  Sun, 
   Scissors, 
   Layers, 
-  ArrowLeft,
-  Store
+  Sun, 
+  Users, 
+  Store,
+  ArrowLeft
 } from 'lucide-react';
 
 const FiltersPage: React.FC = () => {
-  const { setIsLoading, isLoading } = useAppContext();
-  const [seasons, setSeasons] = useState<Season[]>([]);
-  const [styles, setStyles] = useState<Style[]>([]);
-  const [materials, setMaterials] = useState<Material[]>([]);
-  const [genders, setGenders] = useState<Gender[]>([]);
-  const [vendors, setVendors] = useState<Vendor[]>([]);
-  
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const [
-          seasonsData, 
-          stylesData, 
-          materialsData, 
-          gendersData,
-          vendorsData
-        ] = await Promise.all([
-          fetchSeasons(),
-          fetchStyles(),
-          fetchMaterials(),
-          fetchGenders(),
-          fetchVendors()
-        ]);
-
-        setSeasons(seasonsData);
-        setStyles(stylesData);
-        setMaterials(materialsData);
-        setGenders(gendersData);
-        setVendors(vendorsData);
-      } catch (error) {
-        console.error("Failed to load filter data", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [setIsLoading]);
-
-  if (isLoading) {
-    return null; // Global loader is active
-  }
-
-  const toSlug = (name: string) => name.toLowerCase().replace(/\s+/g, '-');
-
-  const getGenderIcon = (name: string) => {
-    return <Users size={32} className="text-current opacity-80" />;
-  };
+  // Static definition of main category types
+  const mainCategories = [
+    {
+      id: 'seasons',
+      title: 'فصل‌ها',
+      subtitle: 'انتخاب لباس بر اساس آب و هوا',
+      image: 'https://images.unsplash.com/photo-1544965850-6f8a69799052?q=80&w=2000&auto=format&fit=crop',
+      icon: <Sun size={24} />,
+      color: '#f59e0b',
+      link: '/collections/season'
+    },
+    {
+      id: 'styles',
+      title: 'سبک و استایل',
+      subtitle: 'کژوال، رسمی، وینتیج و بیشتر',
+      image: 'https://images.unsplash.com/photo-1550614000-4b9519e02a48?q=80&w=2000&auto=format&fit=crop',
+      icon: <Scissors size={24} />,
+      color: '#ec4899',
+      link: '/collections/style'
+    },
+    {
+      id: 'materials',
+      title: 'جنس و پارچه',
+      subtitle: 'چرم، کتان، ابریشم و الیاف طبیعی',
+      image: 'https://images.unsplash.com/photo-1520216135169-92c2df9df1c6?q=80&w=2000&auto=format&fit=crop',
+      icon: <Layers size={24} />,
+      color: '#3b82f6',
+      link: '/collections/material'
+    },
+    {
+      id: 'genders',
+      title: 'جنسیت و رده سنی',
+      subtitle: 'زنانه، مردانه و بچگانه',
+      image: 'https://images.unsplash.com/photo-1620799140408-ed5341cd2431?q=80&w=2000&auto=format&fit=crop',
+      icon: <Users size={24} />,
+      color: '#8b5cf6',
+      link: '/collections/gender'
+    },
+    {
+      id: 'vendors',
+      title: 'نوع فروشگاه',
+      subtitle: 'بوتیک، مزون، طراح مستقل',
+      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2000&auto=format&fit=crop',
+      icon: <Store size={24} />,
+      color: '#10b981',
+      link: '/collections/vendor'
+    }
+  ];
 
   return (
-    <div className="filters-page">
-      <header className="filters-header">
-        <h1 className="page-title">دسته‌بندی و جستجو</h1>
-        <p className="page-subtitle">محصولات را بر اساس سلیقه و نیاز خود پیدا کنید</p>
+    <div className="filters-page-root">
+      <header className="filters-root-header">
+        <h1 className="root-title">دسته‌بندی‌ها</h1>
+        <p className="root-subtitle">برای مشاهده محصولات، ابتدا دسته‌بندی مورد نظر خود را انتخاب کنید</p>
       </header>
 
-      {/* --- Styles Section --- */}
-      <section className="filter-section">
-        <div className="section-title-row">
-          <Scissors size={24} className="text-secondary" />
-          <h2>سبک و استایل</h2>
-        </div>
-        <div className="chips-grid">
-          {styles.map((style) => (
-            <Link 
-              to={`/styles/${toSlug(style.style_name)}`} 
-              key={style.id} 
-              className="filter-chip"
-            >
-              {style.style_title}
-              <span className="chip-sub">{style.style_name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* --- Materials Section --- */}
-      <section className="filter-section">
-        <div className="section-title-row">
-          <Layers size={24} className="text-secondary" />
-          <h2>جنس و پارچه</h2>
-        </div>
-        <div className="chips-grid">
-          {materials.map((mat) => (
-            <Link 
-              to={`/materials/${toSlug(mat.material_name)}`}
-              key={mat.id} 
-              className="filter-chip"
-            >
-              {mat.material_title}
-              <span className="chip-sub">{mat.material_name}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* --- Seasons Section --- */}
-      <section className="filter-section">
-        <div className="section-title-row">
-          <Sun size={24} className="text-secondary" />
-          <h2>فصل‌ها</h2>
-        </div>
-        <div className="season-grid">
-          {seasons.map((season) => (
-            <Link 
-              to={`/seasons/${toSlug(season.season_name)}`}
-              key={season.id} 
-              className="season-card"
-              style={{
-                '--season-color': season.season_color || '#ccc'
-              } as React.CSSProperties}
-            >
-              <div className="season-content">
-                <span className="season-en">{season.season_name}</span>
-                <span className="season-fa">{season.season_title}</span>
+      <div className="main-categories-grid">
+        {mainCategories.map((cat) => (
+          <Link 
+            to={cat.link} 
+            key={cat.id} 
+            className="main-category-card"
+          >
+            <div className="main-cat-bg">
+              <img src={cat.image} alt={cat.title} />
+              <div className="main-cat-overlay"></div>
+            </div>
+            
+            <div className="main-cat-content">
+              <div className="main-cat-icon" style={{ backgroundColor: cat.color }}>
+                {cat.icon}
               </div>
-              <div className="season-arrow">
+              <div className="main-cat-text">
+                <h2>{cat.title}</h2>
+                <p>{cat.subtitle}</p>
+              </div>
+              <div className="main-cat-arrow">
                 <ArrowLeft size={20} />
               </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* --- Genders Section --- */}
-      <section className="filter-section">
-        <div className="section-title-row">
-          <Users size={24} className="text-secondary" />
-          <h2>جنسیت و رده سنی</h2>
-        </div>
-        <div className="gender-grid">
-          {genders.map((gender) => (
-            <Link 
-              to={`/genders/${toSlug(gender.gender_name)}`}
-              key={gender.id} 
-              className="gender-card"
-            >
-              <div className="gender-icon-wrapper">
-                {getGenderIcon(gender.gender_name)}
-              </div>
-              <span className="gender-title">{gender.gender_title}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-      
-      {/* --- Vendors Section --- */}
-      <section className="filter-section">
-        <div className="section-title-row">
-          <Store size={24} className="text-secondary" />
-          <h2>نوع فروشگاه</h2>
-        </div>
-        <div className="vendor-grid">
-          {vendors.map((vendor) => (
-            <Link 
-              to={`/vendors/${toSlug(vendor.vendor_title)}`}
-              key={vendor.id} 
-              className="vendor-card"
-              style={{ '--vendor-color': vendor.vendor_color || '#ccc' } as React.CSSProperties}
-            >
-              <div className="vendor-card-header">
-                <h3 className="vendor-name">{vendor.vendor_name}</h3>
-                <span className="vendor-title">{vendor.vendor_title}</span>
-              </div>
-              <p className="vendor-details">{vendor.vendor_details}</p>
-            </Link>
-          ))}
-        </div>
-      </section>
-
+            </div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 };

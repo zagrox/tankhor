@@ -15,12 +15,13 @@ import BlogDetail from './pages/BlogDetail';
 import StoreProfile from './pages/StoreProfile';
 import Cart from './pages/Cart';
 import FiltersPage from './pages/FiltersPage';
+import CategoryHub from './pages/CategoryHub'; // New Component
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
 import StoresPage from './pages/StoresPage'; 
-import AuthPage from './pages/AuthPage'; // New Auth Import
-import Profile from './pages/Profile'; // New Profile Import
-import SettingsPage from './pages/SettingsPage'; // New Settings Import
+import AuthPage from './pages/AuthPage'; 
+import Profile from './pages/Profile'; 
+import SettingsPage from './pages/SettingsPage'; 
 
 // Simple placeholder components for unused routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -39,8 +40,13 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/social" element={<SocialFeed />} />
             <Route path="/marketplace" element={<Marketplace />} />
+            
+            {/* Master Category List */}
             <Route path="/filters" element={<FiltersPage />} />
             
+            {/* New Intermediate Category Hub (e.g. /collections/season) */}
+            <Route path="/collections/:type" element={<CategoryHub />} />
+
             {/* Auth Routes */}
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<Profile />} />
@@ -49,7 +55,7 @@ const App: React.FC = () => {
             {/* New Stores Directory Route */}
             <Route path="/stores" element={<StoresPage />} />
 
-            {/* SEO-friendly Category Routes */}
+            {/* SEO-friendly Product Listing Routes */}
             <Route path="/seasons/:slug" element={<CategoryPage type="season" />} />
             <Route path="/styles/:slug" element={<CategoryPage type="style" />} />
             <Route path="/materials/:slug" element={<CategoryPage type="material" />} />

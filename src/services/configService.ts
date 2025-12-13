@@ -1,3 +1,4 @@
+
 import { readSingleton } from '@directus/sdk';
 import { directus } from './client';
 import { AppConfiguration } from '../types';
@@ -8,7 +9,7 @@ import { AppConfiguration } from '../types';
 export const fetchAppConfiguration = async (): Promise<AppConfiguration> => {
   const config = await directus.request(
     readSingleton('configuration', {
-      fields: ['*', 'app_logo'],
+      fields: ['*', 'app_logo', 'app_hero'],
     })
   );
   return config as AppConfiguration;

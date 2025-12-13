@@ -1,0 +1,232 @@
+
+.category-hub-page {
+  width: 100%;
+  padding-bottom: 4rem;
+}
+
+/* Nav */
+.hub-nav {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 0 1rem;
+  position: relative;
+  z-index: 10;
+}
+
+.hub-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: white;
+  background-color: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background-color 0.2s;
+  text-decoration: none;
+}
+
+.hub-back-btn:hover {
+  background-color: rgba(0,0,0,0.7);
+}
+
+/* Hero */
+.hub-hero {
+  position: relative;
+  height: 40vh;
+  min-height: 20rem;
+  margin-top: -3.5rem; /* Pull up behind nav */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.hub-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hub-hero-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hub-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+}
+
+.hub-hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 0 1rem;
+  max-width: 40rem;
+  animation: hubFadeUp 0.6s ease-out;
+}
+
+.hub-title {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 1rem;
+  position: relative;
+  display: inline-block;
+}
+
+.hub-title::after {
+  content: '';
+  position: absolute;
+  bottom: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4rem;
+  height: 4px;
+  background-color: var(--accent-color, white);
+  border-radius: 2px;
+}
+
+.hub-desc {
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.6;
+}
+
+/* Grid */
+.hub-grid-container {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .hub-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .hub-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.hub-card {
+  position: relative;
+  height: 10rem;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+  box-shadow: var(--shadow-sm);
+  border-right: 4px solid var(--card-accent, var(--color-secondary)); /* Accent line */
+}
+
+.hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--card-accent, var(--color-secondary));
+}
+
+/* Optional background image for specific types (styles) */
+.hub-card-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hub-card-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+
+.hub-card:hover .hub-card-bg img {
+  transform: scale(1.1);
+}
+
+.hub-card-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.8), rgba(0,0,0,0.4));
+}
+
+.hub-card-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hub-card-text h3 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.hub-card-bg + .hub-card-content .hub-card-text h3 {
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hub-card-text .subtitle {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.hub-card-bg + .hub-card-content .hub-card-text .subtitle {
+  color: rgba(255,255,255,0.8);
+}
+
+.hub-card-arrow {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background-color: var(--bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-main);
+  transition: all 0.2s;
+}
+
+.hub-card-bg + .hub-card-content .hub-card-arrow {
+  background-color: rgba(255,255,255,0.2);
+  color: white;
+  backdrop-filter: blur(4px);
+}
+
+.hub-card:hover .hub-card-arrow {
+  background-color: var(--card-accent, var(--color-secondary));
+  color: white;
+  transform: translateX(-4px); /* RTL */
+}
+
+@keyframes hubFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

@@ -26,9 +26,10 @@ import './styles/pages/Blog.css';
 import './styles/pages/Cart.css';
 import './styles/pages/FiltersPage.css';
 import './styles/pages/CategoryPage.css';
+import './styles/pages/CategoryHub.css'; // Added CategoryHub Styles
 import './styles/pages/StoresPage.css'; 
-import './styles/pages/Auth.css'; // Added Auth Styles
-import './styles/pages/Settings.css'; // Added Settings Styles
+import './styles/pages/Auth.css'; 
+import './styles/pages/Settings.css'; 
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
