@@ -118,6 +118,29 @@ export interface DirectusBlog {
   blog_image: string;
 }
 
+// New Order Interfaces
+export interface DirectusOrderItem {
+  id: number;
+  order: number;
+  product: number | DirectusProduct; // Relation to products
+  quantity: number;
+  unit_price: string;
+  total_price: string;
+}
+
+export interface DirectusOrder {
+  id: number;
+  status: string;
+  user_created: string;
+  date_created: string;
+  date_updated: string;
+  order_total: string;
+  store: number | DirectusStore;
+  order_trackid: string | null;
+  order_weight: string | null;
+  items: number[] | DirectusOrderItem[]; // Relation to order_items
+}
+
 export interface DirectusSchema {
   configuration: AppConfiguration;
   products: DirectusProduct[];
@@ -128,6 +151,8 @@ export interface DirectusSchema {
   blogs: DirectusBlog[];
   reels: DirectusReel[];
   profiles: DirectusProfile[];
+  orders: DirectusOrder[];
+  order_items: DirectusOrderItem[];
 
   // Filter Collections
   category: Category[];
