@@ -3,7 +3,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, ShieldCheck, Truck, CreditCard, Zap, 
-  ArrowLeft, Play, Heart, Sparkles, Shirt
+  ArrowLeft, Play, Heart, Sparkles, Shirt, LayoutGrid
 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { fetchStores } from '../services/storeService';
@@ -138,7 +138,7 @@ const HomeProductCard: React.FC<{ product: Product }> = ({ product }) => {
         {/* Loader Overlay */}
         {!isLoaded && (
           <div className="skeleton-loader">
-             <Shirt size={32} className="fashion-loader-icon text-gray-400" strokeWidth={1} />
+             <Shirt size={24} className="fashion-loader-icon text-gray-400" strokeWidth={1} />
           </div>
         )}
         
@@ -157,7 +157,7 @@ const HomeProductCard: React.FC<{ product: Product }> = ({ product }) => {
       <div className="home-product-details">
         <h3 className="home-product-title">{product.name}</h3>
         <div className="home-product-meta">
-          <span className="home-store-name">{product.storeName}</span>
+          {/* Store Name Removed for cleaner look */}
           <span className="home-product-price">
             {product.finalPrice.toLocaleString('fa-IR')} <span className="text-xs">تومان</span>
           </span>
@@ -193,7 +193,7 @@ const Home: React.FC = () => {
         // Fetch data in parallel
         const [storesData, productsData, reelsData] = await Promise.all([
           fetchStores(),
-          fetchProducts({ limit: 8 }), // Fetch 8 latest products
+          fetchProducts({ limit: 12 }), // Fetch 12 latest products to fill compact grid
           fetchReels(1, 10) // Fetch latest reels
         ]);
 
@@ -325,6 +325,9 @@ const Home: React.FC = () => {
                 {chip.label}
               </Link>
             ))}
+            <Link to="/filters" className="smart-chip icon-only" title="همه دسته‌بندی‌ها">
+              <LayoutGrid size={18} />
+            </Link>
           </div>
         </div>
       </section>
