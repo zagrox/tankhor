@@ -1,7 +1,6 @@
 
 
 
-
 // Update the Category interface to match the Directus collection schema
 export interface Category {
   id: number;
@@ -121,29 +120,6 @@ export interface Reel {
 
 export interface CartItem extends Product {
   quantity: number;
-}
-
-// New Order Interfaces
-export interface OrderItem {
-  id: number;
-  productId: string;
-  productName: string;
-  productImage: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-}
-
-export interface Order {
-  id: number;
-  status: string;
-  date: string;
-  total: number;
-  trackingCode: string | null;
-  storeName: string;
-  storeSlug: string;
-  storeLogo: string;
-  items: OrderItem[];
 }
 
 export interface BlogPost {

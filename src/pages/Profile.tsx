@@ -59,7 +59,7 @@ const Profile: React.FC = () => {
              <p>لیست محصولات و فروشگاه‌های مورد علاقه شما</p>
            </div>
 
-           <div className="dash-card" onClick={() => navigate('/profile/orders')}>
+           <div className="dash-card">
              <div className="dash-icon"><ShoppingBag size={24} className="text-secondary" /></div>
              <h3>سفارش‌های من</h3>
              <p>پیگیری سفارشات جاری و تاریخچه خریدها</p>

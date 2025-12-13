@@ -29,7 +29,6 @@ import './styles/pages/CategoryPage.css';
 import './styles/pages/StoresPage.css'; 
 import './styles/pages/Auth.css'; // Added Auth Styles
 import './styles/pages/Settings.css'; // Added Settings Styles
-import './styles/pages/Orders.css'; // Added Orders Styles
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
