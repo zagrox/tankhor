@@ -26,7 +26,8 @@ import './styles/pages/Blog.css';
 import './styles/pages/Cart.css';
 import './styles/pages/FiltersPage.css';
 import './styles/pages/CategoryPage.css';
-import './styles/pages/StoresPage.css'; // New Import
+import './styles/pages/StoresPage.css'; 
+import './styles/pages/Auth.css'; // Added Auth Styles
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

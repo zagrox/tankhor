@@ -16,6 +16,7 @@
 @import "./pages/StoreProfile.css";
 @import "./pages/Blog.css";
 @import "./pages/FiltersPage.css";
+@import "./pages/Auth.css"; /* Added Auth CSS */
 
 /* 5. Utility Classes (Helpers) */
 .text-center { text-align: center; }

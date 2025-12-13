@@ -1,5 +1,6 @@
 
 
+
 // Update the Category interface to match the Directus collection schema
 export interface Category {
   id: number;
@@ -135,7 +136,17 @@ export interface AppConfiguration {
   id?: string; // FIX: Make id optional as singletons don't have it
   app_logo?: string; // Added field for the global loader logo
   app_title?: string; // Added field for the app title
+  app_user_role?: string; // The Directus Role ID for new users
   [key: string]: any;
+}
+
+export interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  avatar?: string;
+  role?: string;
 }
 
 // --- Filter Data Types ---

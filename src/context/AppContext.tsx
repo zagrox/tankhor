@@ -3,7 +3,8 @@ import React, { createContext, useState, useContext, useEffect, ReactNode } from
 import { fetchAppConfiguration } from '../services/configService';
 import { getAssetUrl } from '../services/client';
 import { fetchCategories } from '../services/categoryService';
-import { AppConfiguration, Category } from '../types';
+import { authService } from '../services/authService'; // Import authService
+import { AppConfiguration, Category, UserProfile } from '../types';
 
 // Marketplace-specific types
 export type PriceSort = 'asc' | 'desc' | 'default';
@@ -13,6 +14,12 @@ interface AppContextType {
   setIsLoading: (isLoading: boolean) => void;
   appConfig: AppConfiguration | null;
   appLogo: string | null;
+
+  // Auth State
+  user: UserProfile | null;
+  setUser: (user: UserProfile | null) => void;
+  isAuthenticated: boolean;
+  logout: () => Promise<void>;
 
   // Marketplace Filter State
   selectedCategories: string[]; // Changed to array for multi-select
@@ -50,6 +57,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const [isLoading, setIsLoading] = useState(true);
   const [appConfig, setAppConfig] = useState<AppConfiguration | null>(null);
   const [appLogo, setAppLogo] = useState<string | null>(null);
+  
+  // Auth State
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   // Marketplace Filter State
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -65,12 +75,13 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
 
 
   useEffect(() => {
-    // Fetch global app settings and categories on initial load
+    // Fetch global app settings, categories and check auth on initial load
     const loadInitialData = async () => {
       try {
-        const [config, categories] = await Promise.all([
+        const [config, categories, currentUser] = await Promise.all([
           fetchAppConfiguration(),
-          fetchCategories()
+          fetchCategories(),
+          authService.getCurrentUser() // Check if user is already logged in via token
         ]);
 
         // Process config
@@ -78,6 +89,9 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
         if (config.app_logo) {
           setAppLogo(getAssetUrl(config.app_logo));
         }
+
+        // Set User
+        setUser(currentUser);
 
         // Process and group categories
         const grouped = categories.reduce((acc, cat) => {
@@ -101,11 +115,20 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     loadInitialData();
   }, []);
 
+  const handleLogout = async () => {
+    await authService.logout();
+    setUser(null);
+  };
+
   const value = {
     isLoading,
     setIsLoading,
     appConfig,
     appLogo,
+    user,
+    setUser,
+    isAuthenticated: !!user,
+    logout: handleLogout,
     selectedCategories,
     setSelectedCategories,
     selectedSeasons,

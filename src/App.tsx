@@ -17,7 +17,9 @@ import Cart from './pages/Cart';
 import FiltersPage from './pages/FiltersPage';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
-import StoresPage from './pages/StoresPage'; // New Import
+import StoresPage from './pages/StoresPage'; 
+import AuthPage from './pages/AuthPage'; // New Auth Import
+import Profile from './pages/Profile'; // New Profile Import
 
 // Simple placeholder components for unused routes
 const Placeholder = ({ title }: { title: string }) => (
@@ -38,6 +40,10 @@ const App: React.FC = () => {
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/filters" element={<FiltersPage />} />
             
+            {/* Auth Routes */}
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/profile" element={<Profile />} />
+
             {/* New Stores Directory Route */}
             <Route path="/stores" element={<StoresPage />} />
 

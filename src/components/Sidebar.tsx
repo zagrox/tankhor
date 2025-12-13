@@ -20,7 +20,7 @@ import { useAppContext } from '../context/AppContext';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const { appLogo, appConfig } = useAppContext(); // Get the app logo and config from context
+  const { appLogo, appConfig, isAuthenticated, user } = useAppContext(); // Get auth state
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true); // Default to collapsed
 
@@ -57,10 +57,15 @@ const Sidebar: React.FC = () => {
     { name: 'وبلاگ', path: '/blog', icon: <Newspaper size={24} /> },
   ];
 
+  // Logic for the User/Profile link
+  const profileLinkPath = isAuthenticated ? '/profile' : '/auth';
+  const profileLinkName = isAuthenticated ? (user?.first_name || 'پروفایل') : 'ورود / عضویت';
+
   const secondaryLinks = [
     { name: 'سبد خرید', path: '/cart', icon: <ShoppingCart size={24} /> },
-    { name: 'پروفایل', path: '/profile', icon: <User size={24} /> },
-    { name: 'تنظیمات', path: '/settings', icon: <Settings size={24} /> },
+    { name: profileLinkName, path: profileLinkPath, icon: <User size={24} /> },
+    // Only show settings if logged in, otherwise hide or maybe keep for app settings
+    ...(isAuthenticated ? [{ name: 'تنظیمات', path: '/profile', icon: <Settings size={24} /> }] : []),
   ];
 
   return (
